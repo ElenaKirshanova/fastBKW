@@ -1,0 +1,102 @@
+\documentclass[a4paper,11pt]{article}
+
+%---enable russian----
+
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{amscd,amsmath,amsthm,euscript}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode} 
+
+
+
+% PROBABILITY SYMBOLS
+\newcommand*\PROB\Pr 
+\DeclareMathOperator*{\EXPECT}{\mathbb{E}}
+
+
+% Sets, Rngs, ets 
+\newcommand{\N}{{{\mathbb N}}}
+\newcommand{\Z}{{{\mathbb Z}}}
+\newcommand{\R}{{{\mathbb R}}}
+\newcommand{\Zp}{\ints_p} % Integers modulo p
+\newcommand{\Zq}{\ints_q} % Integers modulo q
+\newcommand{\Zn}{\ints_N} % Integers modulo N
+
+% Landau 
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand*{\OLandau}{\bigO}
+\newcommand*{\WLandau}{\Omega}
+\newcommand*{\xOLandau}{\widetilde{\OLandau}}
+\newcommand*{\xWLandau}{\widetilde{\WLandau}}
+\newcommand*{\TLandau}{\Theta}
+\newcommand*{\xTLandau}{\widetilde{\TLandau}}
+\newcommand{\smallo}{o} %technically, an omicron
+\newcommand{\softO}{\widetilde{\bigO}}
+\newcommand{\wLandau}{\omega}
+\newcommand{\negl}{\mathrm{negl}} 
+
+% Misc
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+
+
+\newtheorem{theorem}{Теорема}
+\newtheorem{corollary}[theorem]{Следствие}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{observation}[theorem]{Замечание}
+\newtheorem{proposition}[theorem]{Предложение}
+\newtheorem{definition}[theorem]{Определение}
+\newtheorem{claim}[theorem]{Утверждение}
+\newtheorem{fact}[theorem]{Факт}
+\newtheorem{assumption}[theorem]{Предположение}
+
+% 1-inch margins
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\begin{document}
+
+Сразу хотел бы сказать, что с пониманием анализа у меня большие проблемы, ибо сам я никогда этим не занимался и даже некоторые обозначения у меня вызывают вопросы. Поэтому отчеты по этой части будут состоять из вопросов, как может показаться, по очевидным вещам.
+
+\textbf{1. Хотелось бы на всякий случай уточнить, что понимается под «магнитудой» (magnitude). Это параметр $B$ }\\
+
+\textbf{2. Разберем самое начало пункта VI PARAMETER SELECTION AND ASYMPTOTIC ANALYSIS до подпункта A.}
+
+После каждого шага, позиции, который уже были обработаны, должны оставаться на некоторой заданной магнитуде $B$. Т.е. среднее (абсолютное значение) обработанной позиции должно быть очень близким к $B$. Это обусловлено тем, что мы применяем просеивание на каждом шаге редукции. После $t$ шагов мы получаем векторы средней нормы $\sqrt{n}\cdot B$.
+
+Зададим число выборок равным ${m=2^k}$, где $2^k$ это параметр, который будет определять общую сложность алгоритма \textcolor{red}{(можете немного пояснить?)}, мы получим примерно $m=2^k$ выборок после $t$ шагов. Как было описано ранее в статье, полученные выборки будут примерно Гауссовыми с дисперсией $\sigma^2\cdot(nB^2+2^t)$. Мы предполагаем, что лучшая стратегия это сохранение магнитуд двух различных \textcolor{red}{contributions (не очень понял, как корректно перевести)} одного и того же порядка, т.о. мы выбираем $nB^2 \approx 2^t$.
+
+Далее, используя равенство $C \cdot e^{2\pi}(\frac{\sigma \sqrt{2\pi}}{q})^2$ чтобы иметь возможность восстановить одну секретную позицию, используя m выборок, нам необходимо $m=O(e^{4\pi^2 \cdot \frac{\sigma^2 \cdot (nB^2+2^t)}{q^2}})$.
+
+Т.о., мы имеем $\ln{2} \cdot k = 4\pi^2 \cdot \frac{\sigma^2 \cdot (nB^2+2^t)}{q^2} + O(1)$.
+
+\textcolor{red}{Как уже сказал ранее, я вообще не разбираюсь в символах O и остальных. Можете в качестве примера и объяснения разобрать этот и предыдущий ($m$ и $\ln{2} \cdot k$) результат?}
+
+Каждый из $t$ шагов должен доставить $m=2^k$ векторов вида описанного ранее.
+
+Поскольку мы имеем две части на каждом шаге редукции, нам необходимо проанализировать эти части по отдельности. Во-первых, рассмотрим выполнение первой части $i$ - го шага редукции, используя Coded-BKW с $[n_i,d_i]$ линейным кодом, где параметры $n_i$ и $d_i$ на каждом шаге выбраны для оптимального (глобально) выполнения. Мы сортируем $2^k$ векторов по $K=\frac{q^{d_i - 1}}{2}$ различным спискам. Здесь Coded-BKW шаг гарантирует, что все векторы в списке, ограниченные $n_i$ рассматриваемыми позициями, имеют среднюю норму не более чем $\sqrt{n_i}\cdot B$, если кодовое слово вычитается из вектора. Т.о. количество списков $\frac{q^{d_i - 1}}{2}$ должно быть выбрано так, чтобы это ограничение нормы выполнялось. Затем, после шага Coded-BKW, шаг просеивания должен оставить среднюю норму по $N_i$ позициям без изменений, т.е. не более $\sqrt{N_i}\cdot B$.
+
+Поскольку все векторы в списке, можно считать, имеют норму $\sqrt{N_i}\cdot B$ в этих $N_i$ позициях, шагу просеивания необходимо найти любую пару, которая оставляет разницу между нормами двух векторов не более $\sqrt{N_i}\cdot B$. Используя эвристику, что векторы равномерно распределены на сфере радиуса $\sqrt{N_i}\cdot B$, мы знаем, что один список должен содержать не менее $2^{0.208N_i }$ векторов, чтобы иметь возможность производить такое же количество векторов. Оценка времени и пространства равна $2^{0.292N_i}$, если используется LSF.
+
+Примем некоторые дальнейшие обозначения. Поскольку мы ожидаем, что число векторов будет экспоненциально, мы пишем $k=c_0n$ для некоторого $c_0$. Также, мы принимаем $q=n^{c_q}$ и $\sigma=n^{c_s}$. Выбрав $nB^2\approx2^t$, из формулы $\ln{2} \cdot k = 4\pi^2 \cdot \frac{\sigma^2 \cdot (nB^2+2^t)}{q^2} + O(1)$ выводим, что \textcolor{red}{$B=\theta(n^{c_q-c_s})$} и \textcolor{red}{$t=(2(c_q-c_s)+1)\log_2 n + O(1)$}.
+
+\end{document}
