@@ -1,0 +1,108 @@
+\documentclass[a4paper,11pt]{article}
+
+%---enable russian----
+
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{amscd,amsmath,amsthm,euscript}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode} 
+
+
+
+% PROBABILITY SYMBOLS
+\newcommand*\PROB\Pr 
+\DeclareMathOperator*{\EXPECT}{\mathbb{E}}
+
+
+% Sets, Rngs, ets 
+\newcommand{\N}{{{\mathbb N}}}
+\newcommand{\Z}{{{\mathbb Z}}}
+\newcommand{\R}{{{\mathbb R}}}
+\newcommand{\Zp}{\ints_p} % Integers modulo p
+\newcommand{\Zq}{\ints_q} % Integers modulo q
+\newcommand{\Zn}{\ints_N} % Integers modulo N
+
+% Landau 
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand*{\OLandau}{\bigO}
+\newcommand*{\WLandau}{\Omega}
+\newcommand*{\xOLandau}{\widetilde{\OLandau}}
+\newcommand*{\xWLandau}{\widetilde{\WLandau}}
+\newcommand*{\TLandau}{\Theta}
+\newcommand*{\xTLandau}{\widetilde{\TLandau}}
+\newcommand{\smallo}{o} %technically, an omicron
+\newcommand{\softO}{\widetilde{\bigO}}
+\newcommand{\wLandau}{\omega}
+\newcommand{\negl}{\mathrm{negl}} 
+
+% Misc
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+
+
+\newtheorem{theorem}{Теорема}
+\newtheorem{corollary}[theorem]{Следствие}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{observation}[theorem]{Замечание}
+\newtheorem{proposition}[theorem]{Предложение}
+\newtheorem{definition}[theorem]{Определение}
+\newtheorem{claim}[theorem]{Утверждение}
+\newtheorem{fact}[theorem]{Факт}
+\newtheorem{assumption}[theorem]{Предположение}
+
+% 1-inch margins
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\begin{document}
+
+\textbf{Рассмотрим пункт A. Asymptotics of Coded-BKW with sieving.}\\
+
+Предположим, что общая сложность экспоненциальна и запишем ее как $2^{cn}$, для некоторого коэффициента $c$, который определим позднее. Каждый шаг является аддитивным с точки зрения сложности \textcolor{red}{(не очень понял этот момент)}, поэтому предположим, что мы можем использовать $2^{cn}$ на каждом шаге. В $t$ шагах мы выбираем $n_1,n_2,…$ позиций для каждого шага  \textcolor{red}{(примерно понял, но наверное некорректно перевожу).}
+
+Число \textcolor{red}{buckets (не знаю, как корректно перевести)} необходимых для первого шага coded-BKW равно $(C^{'} \cdot n^{c_s})^{n_1}$, где $C^{'}$ другая константа. В каждом \textcolor{red}{bucket} основную часть сложности по времени составляет просеивание стоимостью $2^{\lambda n_1}$, для константы $\lambda$. Итоговая сложность, есть произведение этих выражений, которое должно соответствовать границе $2^{cn}$, и таким образом, мы выбираем $n_1$ таким, что $(C^{'} \cdot n^{c_s})^{n_1} \approx 2^{cn} \cdot 2^{- \lambda n_1}$ \textcolor{red}{(если можно краткое пояснение по итоговой формуле)}.
+
+Прологарифмируем, $c_s \log{n} \cdot n_1 + \log{C^{'}} n_1 = cn - \lambda n_1$. Таким образом, получаем $n_1 = \frac{cn}{c_s \log{n} + \lambda + \log{C^{'}}}$. Чтобы упростить выражение, введем обозначение $W=c_s \log{n} + \lambda + \log{C^{'}}$.
+
+Для следующего шага, мы получаем $W \cdot n_2 = cn - \lambda n_1$, что упрощается с асимптотической точки зрения до $n_2 = \frac{cn}{W} (1 - \frac{\lambda}{W})$.
+
+Продолжая по такой логике, мы имеем, что $W \cdot n_i = cn - \lambda \sum_{j=1}^{i-1}  n_j$ и мы можем получить асимптотическое выражение для $n_i$: $n_i = \frac{cn}{W} (1 - \frac{\lambda}{W})^{i-1}$.
+
+После $t$ шагов мы имеем $\sum_{i=1}^t n_i = n$ таким образом, мы замечаем, что $\sum_{i=1}^t n_i = \frac{cn}{W} \sum_{i=1}^t (1 - \frac{\lambda}{W})^{i-1}$, что упрощается до $n = \sum_{i=1}^t n_i = \frac{cn}{\lambda} (1-(1-\frac{\lambda}{W})^t)$.
+
+Теперь мы знаем, что $c=\lambda (1-(1-\frac{\lambda}{W})^t)^{-1}$.
+
+Поскольку $t$ и $W$ оба порядка $\Theta$ $(\log{n})$  \textcolor{red}{(требуется небольшое пояснение)}, которое стремится к бесконечности как $n$ стремится к бесконечности, мы имеем, что $c=\lambda (1-(1-\frac{\lambda}{W})^{\frac{W}{\lambda} \cdot \frac{t \lambda}{W}})^{-1} \rightarrow \lambda (1-e^{- \frac{t \lambda}{W}})^{-1}$, когда $n \rightarrow \infty$.
+
+Поскольку $t/W \rightarrow (1+2(c_q + c_s))/c_s$, когда $n \rightarrow \infty$ в итоге мы получаем $c=\frac{\lambda}{1-e^{- \lambda(1+2(c_q + c_s))/c_s}}$.
+
+Теперь предположим просеивающую эвристику, что после $i$ - го шага, векторы, ограниченные первыми $N_i$ позициями, распределены равномерно на сфере радиуса $\sqrt{N_i}\cdot B$. Также предположим, что дискретное Гауссово распределение может быть аппроксимировано непрерывным. Тогда мы получаем следующую теорему.
+
+\textbf{Теорема 1.}\\
+Сложность по времени и пространству предложенного алгоритма равна $2^{(c+o(1))^n}$, где $c=\frac{\lambda}{1-e^{- \lambda(1+2(c_q + c_s))/c_s}}$, и $\lambda = 0,292$ для обычных компьютеров и $0,265$ для квантовых.
+
+\textbf{Доказательство:}\\
+Поскольку $c> \lambda$, для процесса различения остается экспоненциальное число выборок. Можно скорректировать константы в формулах $B=\theta(n^{c_q-c_s})$ и $t=(2(c_q-c_s)+1)\log_2 n + O(1)$, чтобы вероятность успеха гипотезы была близка к 1.
+
+\textbf{Итог: для понимания этого разбора мне необходимо понять самое начало, так сказать отправные точки. С выведением более-менее все понятно. Хотя еще можно было бы чуть разобрать формулу $2^{(c+o(1))^n}$ для полного понимания.}\\
+
+\end{document}
