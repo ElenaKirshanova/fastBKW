@@ -21,37 +21,6 @@
 
 
 
-% PROBABILITY SYMBOLS
-\newcommand*\PROB\Pr 
-\DeclareMathOperator*{\EXPECT}{\mathbb{E}}
-
-
-% Sets, Rngs, ets 
-\newcommand{\N}{{{\mathbb N}}}
-\newcommand{\Z}{{{\mathbb Z}}}
-\newcommand{\R}{{{\mathbb R}}}
-\newcommand{\Zp}{\ints_p} % Integers modulo p
-\newcommand{\Zq}{\ints_q} % Integers modulo q
-\newcommand{\Zn}{\ints_N} % Integers modulo N
-
-% Landau 
-\newcommand{\bigO}{\mathcal{O}}
-\newcommand*{\OLandau}{\bigO}
-\newcommand*{\WLandau}{\Omega}
-\newcommand*{\xOLandau}{\widetilde{\OLandau}}
-\newcommand*{\xWLandau}{\widetilde{\WLandau}}
-\newcommand*{\TLandau}{\Theta}
-\newcommand*{\xTLandau}{\widetilde{\TLandau}}
-\newcommand{\smallo}{o} %technically, an omicron
-\newcommand{\softO}{\widetilde{\bigO}}
-\newcommand{\wLandau}{\omega}
-\newcommand{\negl}{\mathrm{negl}} 
-\newcommand*{\poly}{\ensuremath{\mathrm{poly}}}
-
-% Misc
-\newcommand{\eps}{\varepsilon}
-\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
-
 
 \newtheorem{theorem}{Теорема}
 \newtheorem{corollary}[theorem]{Следствие}
@@ -76,7 +45,8 @@
 \parindent 0in
 \parskip 1.5ex
 
-
+%%All notations/commands
+\input{header} % <<< No packages, only new commands
 
 \begin{document}
 
@@ -87,8 +57,8 @@
 	\begin{algorithm}[ph]
 		\caption{Coded-BKW with Sieving}
 		\label{alg:AlgName}
-		\textbf{Вход:}  Матрица $A$ размерности $n \times m$, \\
-		Полученный вектор $z$ длины $m$, \\
+		\textbf{Вход:}  Матрица $A$ размерности $\Z_q^{n \times m}$,\algorithmiccomment{E: исправила область определения матрицы} \\
+		Полученный вектор $z$ длины $m$, \algorithmiccomment{Здесь и далее по тексту: как правило, вектора обозначают  жирным шрифтом, например $\vec{z}$ (см. макро в header.tex). Кроме того, указывают размерность и координаты вектора так: $\zvec \in \Z_q^m$.} \\
 		$t$ - количество шагов,\\
 		$n_i$ - длина линейного кода $[n_i,b]$,\\
 		$1 \leq i < t$ - индексы,\\
@@ -114,7 +84,7 @@
 	
 \textbf{Замечания к алгоритму:}\\
 \begin{enumerate}
-\item Полученный на вход вектор $z$ имеет вид $(s,e)\begin{pmatrix} A\\ I \end{pmatrix} = z \Rightarrow (s,e)H_0 = z$, где $H_0 = \begin{pmatrix} A\\ I \end{pmatrix}$, $s$ - секретный вектор в $Z^{n}_q$, $e$ - вектор ошибок.
+\item Полученный на вход вектор $z$ имеет вид $(s,e)\begin{pmatrix} A\\ I \end{pmatrix} = z \Rightarrow (s,e)H_0 = z$, где $H_0 = \begin{pmatrix} A\\ I \end{pmatrix}$, $s$ - секретный вектор в $\Z^{n}_q$, $e$ - вектор ошибок.
 \item Константа $B$ обозначает средний уровень «мелкости» для позиции.
 \item Опишем процедуру $CodeMap$. В соответствии с основной идеей Coded-BKW, фиксируем код $C_i$ длины $n_i$. Вектор $h$, полученный на входе, сначала считается ограниченным только позициями $N_i+1$ до $N_{i-1}$, т.е. вектор длины $n_i$. Этот вектор, обозначенный $h_{[N_{i-1}+1,N_i]}$, затем отображается в ближайшее кодовое слово в $C_i$. Это ближайшее кодовое слово и обозначается $CodeMap(h,i)$.
 \item Опишем процедуру $Sieve$. Полученное на входе $L_{\Delta}$ содержит список векторов. Мы рассматриваем их только первые $N_i$ позиций. Эта процедура найдет разности между любыми двумя векторами такими, что норма разности, ограниченная первыми $N_i$ позициями, меньше, чем $\sqrt{N_i}\cdot B$. Все такие разности отправляются в список $S_{\Delta}$, что и есть результат процедуры. Обычно, список $S_{\Delta}$ содержит примерно столько же векторов, сколько и $L_{\Delta}$. Предполагаем, что векторы в $L_{\Delta}$ ограниченные первыми $N_i$ позициями все имеют норму примерно равную $\sqrt{N_i}\cdot B$. Тогда задача решается алгоритмами просеивания в решетках, например, используя LSH.
