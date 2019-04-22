@@ -1,0 +1,7 @@
+Abstract
+
+This thesis is dedicated to the analysis of hard problems based on lattices in $n$-dimensional Euclidean space. We consider the problems most relevant to cryptography, the Learning with Errors (LWE) Problem and the Shortest Vector Problem. 
+
+Complexity of Learning with Errors problem, asymptotical and practical, is studied in the first part of the thesis. We analyze the hardness of LWE under lattice-based attacks and provide their running times of the form $2^{\const n + \smallo(n)}$, where we make the constant $\const$ explicit as a function of LWE parameters. From a theoretical perspective, our analysis reveals how the complexity of the problem changes as a function of its parameters. From a practical perspective our analysis is a useful tool to choose LWE parameters resistant to known attacks. We make our study complete by providing real running times of lattice-based LWE solvers for various ranges of parameters.
+
+The second part of the thesis deals with heuristic sieving algorithms for the Shortest Vector Problem. The main result is an algorithm with $2^{0.1877n+\smallo(n)}$ memory-complexity and $2^{0.396n+\smallo(n)}$ running time. The speed-up is obtain from an efficient algorithm for finding a triple of lattice-vectors whose sum has a short Euclidean norm.

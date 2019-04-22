@@ -1,0 +1,152 @@
+
+ 
+\documentclass[a4paper,twoside,table,10pt,openright]{mythesis}
+%\def\thesistitle{Public-Key Cryptography from Simple Primitives}
+\def\thesistitle{Improved Security Proofs and Constructions for Public-Key Cryptography}
+
+\usepackage[utf8x]{inputenc}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+%Jolis headers
+\pagestyle{fancy} 
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}{}}
+\usepackage{xspace}
+\fancyhead[RO]{{\footnotesize\rightmark}\hspace{2em}\thepage}
+\setcounter{tocdepth}{2} 
+\fancyhead[LE]{\thepage\hspace{2em}\footnotesize{\leftmark}}
+\fancyhead[RO]{{\footnotesize\rightmark}\hspace{2em}\thepage}
+\fancyhead[RE,LO]{\thesection}
+\fancyfoot{}
+
+\usepackage{units} 
+\usepackage{cite,url}
+
+\usepackage{amscd,amsmath,amssymb,amsthm}
+\usepackage{amsfonts}
+\usepackage[english]{babel}
+\usepackage{tikz}
+\usetikzlibrary{matrix,arrows}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations,decorations.text}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{shapes}
+\usetikzlibrary{intersections}
+\usepackage{centernot}
+\usepackage{xspace}
+\usepackage{graphicx,pstricks}
+\usepackage{array}
+\usepackage[T1]{fontenc}       
+\usepackage{xcolor}
+\usepackage{dashbox}
+\usepackage{makecell}
+\usepackage{paralist}
+\usepackage{pifont}
+\usepackage{paralist}
+\usepackage{pdfpages} 
+
+\usepackage[pagebackref=true]{hyperref} % Labo
+\usepackage[capitalize,nameinlink,noabbrev]{cleveref}
+\hypersetup{pdfauthor = {M.Sc. Jiaxin Pan}, pdftitle = {\thesistitle}, 
+pdfsubject = {PhD Thesis}, 	pdfkeywords = {Cryptography, Signature}, pdfcreator={LaTeX}, pdfproducer={pdflatex}} % producer of the document
+%\usepackage{minitoc}
+
+\usetikzlibrary{calc}
+	
+  
+\usepackage{titlesec}
+
+\titleformat*{\section}{\Large\bfseries}
+\titleformat*{\subsection}{\large\bfseries}
+
+\setcounter{secnumdepth}{3}
+
+\title{\thesistitle}
+\author{M.Sc. Jiaxin Pan}
+\date{Soon}
+\pagenumbering{alph}
+\pagestyle{empty}
+%\includeonly{title,merci,01_IntroductionFr,01_Introduction,02_Preliminaries}
+
+\begin{document}
+%	\selectlanguage{english}
+	\begin{titlepage}
+		\centering
+		\includegraphics[width=300pt]{Rublogo}
+		\ \\[100pt]
+		\rule[0pt]{\textwidth}{1pt}\\[7pt]
+		{\LARGE \textbf{\thesistitle}}
+		\rule[1pt]{\textwidth}{1pt}\\[140pt]
+		{\LARGE \textbf{Doctoral Dissertation}}\\
+		\vfill
+		{\Large by}\\[5pt]
+		{\Large {M.Sc. Jiaxin Pan}}\\[10pt]
+		{\today}
+	\end{titlepage}
+%
+%%\maketitle
+%\include{title}
+%%\dominitoc
+%%\pagestyle{plain}
+%\pagenumbering{roman}
+%\include{merci}
+%\newpage
+%\newpage
+%$\big.$
+%\vspace{4cm}
+%$\big.$ \\
+%\noindent Young man, in mathematics you don't understand things. You just get used to them. \\
+%\emph{Jeune homme, en mathématique on ne comprend pas les choses. On s'y habitue.} \\ 
+%$\big.$ \hfill -- John von Neumann
+%\vspace{10cm}
+%{
+%\center
+%\includegraphics[width=16cm]{metamorphosis.png}
+%}
+%{\begin{flushright}
+%Extrait de {\em Metamorphosis III} -- Maurits Cornelis Escher.
+%\end{flushright}}
+
+\newpage
+\tableofcontents
+%% Configuration of the header strings for the main manuscript pages.
+\newpage
+\pagestyle{fancy}
+%\include{01_IntroductionFr} %Prolégomènes
+ 
+\pagenumbering{arabic}
+
+ 
+
+\bibliographystyle{alpha}
+\bibliography{cryptobib/abbrev3,cryptobib/crypto,other}
+ 
+ 
+%\includepdf[pages=-]{CV.pdf}
+ 
+%%% Configuration of the header strings for the Appendices
+%\renewcommand{\chaptermark}[1]{%
+%  \markboth{\MakeUppercase{\appendixname\ \thechapter}}%
+%  {\MakeUppercase{#1}}
+%} 
+%\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
+%\renewcommand{\sectionmark}[1]{\markright{\MakeUppercase{#1}}{}}
+%\renewcommand{\headrulewidth}{0pt}
+%\fancyhead[LE]{\thepage\hspace{2em}\footnotesize{\leftmark}}
+%\fancyhead[RE,LO]{}
+%\fancyhead[RO]{{\footnotesize\leftmark}\hspace{2em}\thepage}
+%
+%\fancyhead[RE,LO]{}
+%
+%
+%\appendix
+%\cleardoublepage
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 

@@ -1,0 +1,51 @@
+\subsection{Analysis} \label{subsec:qAryImprovedAnalysis}
+
+The analysis of the improved algorithm proceeds exactly like the analysis of Algorithm~\ref{alg:ApproxSVP} presented in Thm.~\ref{thm:appSVP}. The only difficulty comes from estimating the length of the vectors in the output list $L_k$ and, hence, concluding on $k$. The proof below is mostly dedicated to this matter.
+
+\begin{thm} \label{thm:appSVPImproved}
+	Algorithm~\ref{alg:ApproxSVP} on input (1) a lattice-basis $\DMat \in \Z_q^{2n \times 2n}$ as in Eq.~(\ref{eq:BasisD}) for the lattice $\qLATTp(A)$ with $q = \bigO(n^{\cq})$, (2) an approximation factor $\gamma = \bigO(n^{\cg})$, and (3) $0<\eps<1/4$, outputs a vector $\vvec \in \qLATTp(A)$ of length $\|\vvec \| \leq n^{\cg+\cq/2 + 1/2}$ in expected time $T(\appSVP) = 2^{(\const + \smallo(1))n}$, where
+	\begin{equation} \label{eq:AppSVPImprovedRT}
+	 \const = \frac{1/2 - 2\eps}{\ln \left( \frac{\cq}{ \cq \cdot  (1/2 -2\eps \ln(2)) -  \cg \cdot 2(1/2-2\eps)} \right)}.
+	 \end{equation}
+\end{thm}
+
+\begin{proof}
+	Analogously to Algorithm~\ref{alg:ApproxSVP}, the expected number of lattice-vectors needed to fill-up all the buckets on step $i$ is now given by
+	\[
+		\E[\#\text{buckets on level } i]= \frac{\vol([-\frac{q-1}{2}, \frac{q-1}{2}]^{d_i})}{\vol([-R_i/2, R_i/2]^{d_i})} \cdot \frac{\vol([-\frac{\sqrt{2}^{i-1}R_1}{2}, \frac{\sqrt{2}^{i-1}R_1}{2}]^{d_i})}{\vol([-R_i/2, R_i/2]^{d_i})} = \TLandau \Big( \Big(\frac{q}{R_i} \cdot \frac{\sqrt{2}^{i-1}R_1}{R_i} \Big)^{d_i}\Big),
+	\]
+	where the second multiple, the fraction of the volumes of two cubes, comes from the additional bucketing on the right-hand side coordinate-blocks.
+	Setting $R_i = x^{i-1}R_1$ for some $x = 2^{1/2 - \eps}$, the expected number of buckets on level $i$, or, equivalently, the running time of the algorithm, is (up to a $\poly(n)$-factor) 
+	\[
+		\Big( \Big( \frac{\sqrt{2}}{x^2} \Big)^{i-1} \frac{q}{R_1}  \Big)^{d_i}  = 2^{n \const}.
+	\]
+	The above formula yields for $d_i$
+	\begin{equation}\label{eq:d_iImp}
+		d_i = \frac{n\const}{\log(q/R_1)-(i-1)\log(x^2/\sqrt{2})}.
+	\end{equation}
+	For the rest of the proof, assume $\eps<1/4$ and, hence, $\log(x^2 /\sqrt{2})>0$. As in the proof of Thm.~\ref{thm:appSVP}, from the above expression for $d_i$ and the fact that $\sum_{i=1}^k d_i = n$, we determine $\const$ once we know $k$.
+	
+	The expected length of a vector from $L_k$ is upper-bounded as follows
+	\[
+	\| \vvec\| \leq \sqrt{2d_k (\sqrt{2}R_k)^2 + \ldots + 2d_1 (\sqrt{2}^k R_1)^2} = 2R_1 \sqrt{\sum_{i=1}^k d_i (\sqrt{2}^{k-i} x^{i-1})^2} = R_1 \sqrt{2^{k+1}} \sqrt{\sum_{i=1}^k d_i 2^{-2\eps(i-1)}}.
+	\] 
+	Using the expression for $d_i$ given in Eq.~(\ref{eq:d_iImp}) and the fact that $x= 2^{1/2 - \eps}$, the argument in the $\sqrt{(\cdot)}$ from above is
+	\[
+		\sum_{i=1}^k d_i 2^{-2\eps(i-1)} =  n \const \sum_{i=0}^{k-1} \frac{1}{2^{2\eps i}(\log{q/R_1} - i (1/2 - 2 \eps))}. 		
+	\]
+	Upper-bounding the sum by the integral, we notice that an integral of the form $\int \frac{\d x}{2^{ax}(b - x c)}$ for positive $a, b, c$ is equal to $\frac{2^{-ab/c}}{c} \Ei_1 (a \ln(2)x - \frac{ab\ln(2)}{c})$, where $\Ei_1$ is the exponential integral $\Ei_1(z) = \int_1^{\infty} \frac{e^{-tz}}{t} \d t$ (we refer the reader to \cite{Leb63} for properties of this integral). We know that the sum we are currently computing is of order $\Theta(n^{\alpha})$ for some constant $\alpha$ and we are only interested in determining this $\alpha$ (not the precise constants and lower-order terms) as $\alpha$ will appear in the constant for $k$. In our case, $\alpha$ is actually negative, so the bound on the length of an element in $L_k$ will eventually be (up to constants) $2^{k}\sqrt{n^{1+\alpha}}$ (here, as in the previous algorithm, we set $R_1=n^{\smallo(1)}$ and we ignore $\smallo(1)$-terms).
+	
+	Substituting our values for $a, b, c$, we have (up to multiplicative constants) (1) $2^{-ab/c} = n^{-\frac{2 \eps \cq}{1/2 - 2\eps}}$, and (2) $\Ei_1 (a \ln(2)x - \frac{ab\ln(2)}{c}) = n^{-\frac{2 \ln(2) \eps \cq}{1/2 - 2\eps}}$. The length of the output vector is required to be bounded by $n^{\cg+\cq/2 + 1/2}$, from where we have (ignoring $\smallo(1)$-terms)
+	\[
+		k \leq 2 \Big( \frac{(1+\ln(2))\eps \cq}{1/2 - 2\eps} + \frac{\cq}{2} + \cg \Big) \log n.
+	\]    
+	Note that for $\eps=0$, we receive the value for $k$ as in Alg.~\ref{alg:ApproxSVP}. As soon as $\eps<1/4$, the above choice for $k$ guarantees that $k < \frac{\cq}{1/2-\eps}$ -- the upper-bound for $k$ coming trivially from $d_k>0$ (otherwise, the denominator in Eq.~(\ref{eq:d_iImp}) is negative).
+	
+	We compute the sum $\sum_{i=1}^k d_i$ as we did in the proof of Thm.~\ref{thm:appSVP}, and obtain
+	\[
+		\const = \frac{1/2 - 2\eps}{\ln \left( \frac{\cq}{ \cq \cdot  (1/2 -2\eps \ln(2)) -  \cg \cdot 2(1/2-2\eps)} \right)} + \smallo(1).
+	\]   
+	In case $\eps=0$, the algorithm is exactly our first Algorithm~\ref{alg:ApproxSVP} with $\const = \frac{1}{2 \ln \big( \frac{\cq}{\cq/2-\cg} \big)} +\smallo(1)$.  
+\end{proof}
+
+One could further optimize for $\eps$, but the resulting expression neither simplifies the expression for $\const$, nor does it provide more insights into the algorithm's complexity. In the next section, we compare the two algorithms, Alg.~\ref{alg:ApproxSVP} and Alg.~\ref{alg:ApproxSVPImprived} (setting $\eps = 1/5$ for the latter) with the \BKZ algorithm for $\appSVP$.

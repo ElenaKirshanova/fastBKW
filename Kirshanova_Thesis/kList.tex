@@ -1,0 +1,99 @@
+In its most general form, the $k$-List problem is defined as follows:
+\begin{definition}[$k$-List Problem] \label{def:kList}
+	Given $k$ lists $L_1, \ldots, L_k$ of elements from a set $X$, the task is to find $k$-tuples $(x_1, \ldots, x_k) \in L_1 \times \ldots \times L_k$ that satisfy some condition $C$. Such a tuple $(x_1, \ldots, x_k)$ is called a solution to the $k$-List problem.
+\end{definition}
+
+Typically, the elements of the lists are iid.\ uniformly chosen from $X$, and the size of the lists $L_i$ is exponential in the bit-length of a list-element. The number of output solutions depends on a concrete instantiation of the $k$-List problem: in some cases (as in Sect.~\ref{sec:Approx_kList_Euclid}), we require to output almost all solutions, while sometimes only one or constant number of solutions is enough. 
+
+In the examples of the $k$-List problem we consider here, a set $X$ from where the list-elements are taken, is equipped with a metric. For instance, in case $X = \ZO{n}$ it is the Hamming weight (i.e., distance from $\zerovec$) $wt(\cdot)$, and in case $X$ is a subspace of Euclidean space, there is the $\ell_2$-norm defined on $X$. Condition $C$ that must be satisfied by the output will be naturally related to this metric. For example, when $L_i \subset \R^n$, we can ask for tuples whose sum, $\xvec_1 + \ldots + \xvec_k$, is short. We give more examples below.
+
+Clearly, algorithms for $k$-List problems require at least $\sum_i |L_i|$ memory, and the running time is at least $\max\{\sum_i |L_i|, \# \text{output solutions}\}$. We also consider cases when lists are equal. 
+ 
+There is a plethora of cryptographic tasks that can be phrased as a $k$-List problem. Probably the most popular is the collision-search problem for a hash-function $f:\ZO{*} \rightarrow \ZO{n}$. The birthday paradox states that if we have 2 lists each of size $2^{n/2}$ with elements of the form $(x, f(x))$ in the first list and $(x', f(x'))$ in the second, then search for a pair with s.t.\ $f(x)=f(x')$ gives a collision for $f$ with constant success probability.
+
+
+Wagner extended this idea to what he calls the Generalized Birthday problem \cite{C:Wagner02}: given $k$ lists $L_i \subset \ZO{n}$, a tuple $(\xvec_1, \ldots, \xvec_k) \in L_1 \times \ldots \times L_k$ is a solution if $\xvec_1 \oplus \ldots \oplus \xvec = \tvec$ for some input $\tvec \in \ZO{n}$. He proposed an algorithm running in time $\xTLandau(2^{\sqrt{n}})$ that uses $\xTLandau(2^{\sqrt{n}})$ lists of size $\xTLandau(2^{\sqrt{n}})$. The Generalized Birthday problem has found its applications in breaking hash-functions, forging signature schemes \cite{C:Wagner02}, and attacking stream-ciphers \cite{AC:NikSas15}.
+
+Another famous $k$-List algorithm is due to Blum, Kalai, and Wasserman \cite{BKW}. We write \BKW when we refer to this algorithm. It solves the \emph{Learning Parity with Noise} problem -- a binary counterpart of $\LWE$ -- a very well-known problem in machine learning. Different to \LWE, the vectors $\avec_i$ and the secret $\svec$ are now from $\ZO{n}$, and the noise $e_i$ follows the Bernoulli distribution with parameter $\tau \in [0, 1/2)$. In contrast to Wagner's algorithm, where the list-sizes and their number $k$ can be optimally chosen, the number of lists in the \BKW algorithm is limited to $n^{1-\eps}$. A tuple $(\xvec_1, \ldots, \xvec_k)$ is a solution if $wt(x_1 \oplus \ldots \oplus x_k) = 1$. 
+
+The \BKW algorithm received even more attention after Albrecht et al.\ in \cite{DCC:ACFFP15} analyzed it for \LWE. In this case, the list elements are formed from $\avec_i \in \Z_q^n$ -- the first components of \LWE samples. A tuple we seek for must satisfy $\xvec_1 + \ldots + \xvec_k =  (0, \ldots 0, 1, 0, \ldots, 0) \bmod q$. Recently, Kircher-Fouque \cite{C:KirFou15} and Guo et al.\ \cite{C:GuoJohSta15} independently realized that the condition can be slightly relaxed: asking for a tuple with a short sum $\xvec_1 + \ldots + \xvec_k$ leads to an improved algorithm for \LWE. %For both, \LWE and \LPN problems, the input lists $L_i$ are identical.
+
+Kuperberg's quantum algorithm for the Dihedral Hidden Subgroup problem \cite{Kup05} is yet another example of a $k$-List algorithm. It operates with lists $L_i \subset \Z_N$ and searches for a tuple $(x_1, \ldots, x_k)$ that sums up to $N/2$. This is a quantum analog of Wagner's algorithm for the Generalized Birthday problem, but it operates with relative phases, $x_i$'s, of quantum superpositions. Optimal list sizes and $k$ are chosen exactly in the same way as in Wagner's algorithm. 
+
+If we turn our attention to $k$-List problems over Euclidean spaces, we land in the realm of algorithms for the Shortest Vector Problem. Namely, for \ $X \subset \Lat$, and $k=2$, the task of finding pairs $(\xvec_1, \xvec_2) \in L_1 \times L_2$ s.t.\ $\| \xvec_1 + \xvec_2 \| < \min \{ \| \xvec_1 \|, \| \xvec_2 \| \}$ is at heart of so-called \emph{sieving} algorithms for \SVP \cite{STOC:AjtKumSiv01}. List-elements are vectors of a lattice. The lists are \emph{exponential} in the lattice-dimension. An important requirement here is that the number of solutions has to be asymptotically equal to the size of input lists, i.e.\ exponential. 
+Large memory complexity precludes sieving algorithms from being practically competitive with other algorithms for \SVP.
+
+A progress towards memory-efficient \SVP-sieving was recently achieved by Bai, Laarhoven, and Stehl\'{e} (BLS, for short). In \cite{BLS16}, they generalize sieving algorithms for $k$ larger than 2. Intuitively, the larger $k$ is, the shorter the input lists can be to guarantee the same number of solutions, since instead of $|L_1| \cdot |L_2|$ tuples, we have $|L_1| \cdot \ldots \cdot |L_k|$ tuples in total. On the other hand, larger $k$ results in increased running time. In Sect.~\ref{sec:Approx_kList_Euclid} we present a $k$-List algorithm that achieves a better running time than the one presented in \cite{BLS16}.
+
+We should stress that in all these examples the expected number of solutions is very large. In other words, $k$-List problems are \emph{high density} problems. The algorithms exploit this fact by dropping many solutions and focusing only on solutions with some distinguished property. 
+
+A common strategy to solve a $k$-List problem is to identify such a distinguished property (or a search criterion) for a solution-tuple that would help to find a solution. The size of input lists is then chosen such that the number of solutions that satisfy this property is large enough.
+
+For example, Wagner's algorithm \cite{C:Wagner02} outputs a solution $(\xvec_1, \ldots, \xvec_n)$ if $[(\xvec_i \oplus \xvec_{i+1})]_{1}^{\ell} = \zerovec$ for all odd $i<n$, where for a vector $\xvec$ we denote $[x]_i^j$ as its projection on coordinates $(i, \ldots j)$ for $i \leq j$. The value $\ell$  in Wanger's algorithm is optimally chosen as $\ell = \sqrt{n}$. Such a pair-wise constraint allows to search for a pair of vectors $(\xvec_i, \xvec_{i+1}) \in L_i \times L_{i+1}$ independently from another pair $(\xvec_j, \xvec_{j+1}) \times (L_j, L_{j+1})$. Each of these pairs is then combined into a vector producing two new lists with elements having 0's on the last $\ell$ coordinates. The same constraint is then put on the next $\ell$ coordinates of vectors from the new lists. Of course, with this approach we lose many solutions and we account for that by appropriately setting the input-lists' sizes. Currently, the searching criteria of Wagner's algorithm is the best for the Generalized $k$-List problem over $\ZO{n}$.
+
+We describe our searching criteria in Sect.~\ref{subsec:ConfigL2} for \SVP. It is similar to Wagner's criteria in a sense that it puts a \emph{pairwise} constraint on a solution-tuple. On the other hand, different from Wagner's algorithm, our constraint makes a `global' effect on all the lists: choosing $\xvec \in L_1$ affects not only $L_2$, but all $L_i$'s. It turns out that our constraint does not only speed up the search, but is also met by a large fraction of all the solutions. Thus, our searching constraint does not incur an growth of the input lists. This is particularly beneficial for \SVP-sieving where memory is a big concern.  
+
+Finally, in Sect.~\ref{sec:ApproxQary}, we present another $k$-List algorithm but now for the 
+\emph{approximate} \SVP problem on $q$-ary lattices of dimension $2n$, where the approximation factor is $\poly(n)$. We present two algorithms: the first is very similar to the \BKW algorithm presented in \cite{C:GuoJohSta15, C:KirFou15}. The second puts a more rigid constraint on the solution-tuple, which nevertheless, does not increase the input lists and yet results in a faster $k$-List algorithm. 
+
+Table~\ref{table:kListAlgs} summarizes known $k$-List algorithms. 
+
+
+
+\clearpage
+
+\renewcommand{\arraystretch}{1.6}
+\begin{table}[h]
+\centering
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{|l | c | c | c |}
+		\hline
+			\multicolumn{4}{|c|}{$L_i \subset \ZO{n}$} \\ \hline 
+			\multicolumn{1}{|c|}{Algorithm} &  $k$ & $| L_i |$ & $T$ \\ \hline
+			$\BKW$ for \LPN: & & & \\
+			\hspace{3pt} $ wt(\xvec_1 \oplus \ldots \oplus \xvec_k) = 1$ (\cite{BKW}), or &  &  & \\ 
+			\hspace{3pt}  $wt(\xvec_1 \oplus \ldots \oplus \xvec_k)$ - small (\cite{AC:GuoJohLon14}) & & & \\  %\cline{2-4}
+			\hspace{15pt} $\bullet$ $2^{\bigO(\tfrac{n}{\log n})}$ samples & $n^{1-\eps}$ & $2^{\bigO(\frac{n}{\log n})}$ & $2^{\bigO(\frac{n}{\log n})}$ \\ \cline{2-4}
+			\hspace{15pt} $\bullet$ $\poly(n)$ samples \cite{LyuLPN05} &$n^{1-\eps}$ &  $\poly(n)$ &  $2^{\bigO(\frac{n}{\log \log n})}$ \\ \hline 
+			Wagner's $k$-tree algorithm \cite{C:Wagner02} & \multirow{2}{*}{$k$} &  \multirow{2}{*}{$\softO(k2^{\frac{n}{\log k +1}})$} & \multirow{2}{*}{$\softO(k2^{\frac{n}{\log k +1}})$} \\ 
+			\hspace{3pt} $\xvec_1 \oplus \ldots \oplus \xvec_k = \tvec$ for some input $\tvec$ &  &  & \\ \hline
+			Extended $k$-tree algorithm  \cite{SODA:MinSin09}  & \multirow{2}{*}{$k$} & \multirow{2}{*}{$m$} & \multirow{2}{*}{\parbox[t]{4cm}{ $2^{(\log k + \frac{n-2^p \log m}{\log k -p})}$, \linebreak \scriptsize where $p$ is the smallest integer s.t.\ $n \leq (\log k -p +1)2^p \log m$ } } \\
+			\hspace{3pt} $\xvec_1 \oplus \ldots \oplus \xvec_k = \tvec$ for some input $\tvec$ &  &  & \\ \hline 
+			\multicolumn{4}{|c|}{$L_i \subset \Z_q$} \\ \hline 
+			Dense Subset-Sum \cite{Lyu05} & \multirow{2}{*}{ $\tfrac{1}{2} n ^{1-\eps}$} & \multirow{2}{*}{$2^{\bigO(\tfrac{n^{\eps}}{\log n})}$} &  \multirow{2}{*}{$2^{\bigO(\tfrac{n^{\eps}}{\log n})}$} \\ 
+			\hspace{3pt} $\sum_{i \in I} x_i = t \bmod q$, $q = 2^{n^{\eps}}$ & & & \\ \hline
+			Kuperberg's algorithm \cite{Kup05}  & \multirow{2}{*}{$2^{\bigO(\sqrt{n})}$}  & \multirow{2}{*}{$2^{\bigO(\sqrt{n})}$} & \multirow{2}{*}{$2^{\bigO(\sqrt{n})}$} \\ 
+			\hspace{3pt} $\sum_{i \in I} x_i = q/2$, $q = 2^n$  & & & \\ \hline 
+			\multicolumn{4}{|c|}{$L_i \subset \Z_q^n$} \\ \hline
+			$\BKW$ for \LWE with parameters $(n, \alpha, q)$: & & & \\
+				\hspace{5pt} $\bullet$ $2^{\TLandau(n)}$ \LWE samples  & & & \\ 
+				\hspace{15pt} -- $\| \xvec_1 + \ldots + \xvec_k \| = 1$ \cite{DCC:ACFFP15} & $\TLandau(n)$ & $2^{\frac{1}{2} \frac{\cq}{\ca - 1/2}n + \smallo(n) }$ & $2^{\frac{1}{2} \frac{\cq}{\ca - 1/2}n + \smallo(n) }$ \\ %\cline{2-4}
+				\hspace{15pt} -- $\| \xvec_1 + \ldots + \xvec_k \|$ - small \cite{C:GuoJohSta15, C:KirFou15} & $\TLandau(n)$ & $2^{\frac{\cq}{1+2 \ln(\cq / (\cq+\ca))} n + \smallo(n)}$ & $2^{\frac{\cq}{1+2 \ln(\cq / (\cq+\ca))} n + \smallo(n)}$  \\ %\cline{2-4}
+				\hspace{5pt} $\bullet$ $\TLandau(n \log n)$ \LWE samples & & & \\
+				\hspace{15pt} -- $\| \xvec_1 + \ldots + \xvec_k \| = 1$ & $\TLandau(n)$ & $\TLandau(n \log n)$ & $2^{\frac{1}{2} \frac{\cq}{\ca} n + \smallo(n) }$ \\
+				\hspace{15pt} -- $\| \xvec_1 + \ldots + \xvec_k \|$ - small \cite{DCC:HKM} & $\TLandau(n)$ & $\TLandau(n \log n)$ & $2^{\frac{1}{\ln(\cq / (\cq+\ca))} n + \smallo(n)}$ \\  \hline  
+			\multicolumn{4}{|c|}{$L_i \subset \Lat$} \\ \hline 
+			Sieving algorithms for \SVP &  & & \\ 
+			\hspace{3pt} $\bullet$ $\| \xvec_1 \pm \xvec_2 \| < \max\{ \| \xvec_1 \|, \| \xvec_2 \| \}$ \cite{SODA:BDGL16} & 2 & $2^{0.208n + \smallo(n)}$ & $2^{0.292n + \smallo(n)}$ \\
+			\hspace{3pt} $\bullet$ $\| \xvec_1 \pm \xvec_2 \pm \ldots \pm \xvec_k \| < \max_i\{ \| \xvec_i \| \}$ & & & \\ 
+			\hspace{15pt} -- BLS Algorithm \cite{BLS16} & $\Theta(1)$ & \multirow{2}{*}{$\softO \Bigl( \Bigl( \frac{k^{\tfrac{k}{k-1}}}{k+1} \Bigr)^{\tfrac{n}{2}} \Bigr)$} & see Eq.~\eqref{eq:RunTime} \\
+			\hspace{15pt} -- Our Algorithm~\ref{alg:AlgConfig} (Sect.~\ref{subsec:KListAlgL2}) & $\Theta(1)$ &  & see Eq.~\eqref{eq:RunTimeBLS} \\ \hline
+			\multicolumn{4}{|c|}{$L_i \subset \qLATTp(\AMat) \subset \Z_q^{2n}$} \\ \hline
+			Combinatorial algorithms for $\appSVP$ &  & \multicolumn{2}{c|}{} \\ 
+			\hspace{3pt} $\| \sum_i \xvec_i \| < n^{\cg} \lambda_1(\qLATTp(\AMat))$, $\cg=\TLandau(1)$ &  &  \multicolumn{2}{c|}{} \\
+			\hspace{3pt} $\bullet$ Algorithm~\ref{alg:ApproxSVP} (Sect.~\ref{subsec:qAryAlg}) & $\TLandau(n)$ & \multicolumn{2}{c|}{See Eq.~(\ref{eq:AppSVPRT})} \\
+			\hspace{3pt} $\bullet$ Algorithm~\ref{alg:ApproxSVP} (Sect.~\ref{subsec:qAryAlg}) & $\TLandau(n)$ & \multicolumn{2}{c|}{See Eq.~(\ref{eq:AppSVPImprovedRT})} \\
+			\hline
+	\end{tabular}
+	}
+	\caption[$k$-List algorithms]{$k$-List algorithms. In the left-most column alongside with an algorithm, we show the condition that should be met by a solution tuple $(x_1, \ldots, x_k)$. For \LWE, we set $q = n^{\cq}, \alpha = \frac{1}{n^{\ca}}$.
+	\label{table:kListAlgs}}
+\end{table}
+
+\clearpage
+
+\input{kListEuclid}
+
+\clearpage
+
+\input{SVP_qary}

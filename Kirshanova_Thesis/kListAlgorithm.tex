@@ -1,0 +1,272 @@
+\subsection{Algorithm} \label{subsec:KListAlgL2}
+
+\begin{algorithm}[H]
+\caption{$k$-List for the Configuration Problem}
+\label{alg:AlgConfig}
+\textbf{Input:} $L_1, \ldots, L_k$ -- lists of vectors from $\Sphere{n}$. $\Conf_{i,j}=\ScProd{\xvec_i}{\xvec_j} \in \R^{k \times k}$ -- Gram matrix. $\eps>0$. \\
+\textbf{Output:} $\Lout$ -- list of $k$-tuples $\xvec_1 \in L_1, \ldots, \xvec_k \in L_k$, s.t.\ $\abs{\ScProd{\xvec_i}{\xvec_j}-\Conf_{ij}} \leq \eps$, for all $i,j$.
+
+\begin{algorithmic}[1]
+
+\State $\Lout \gets \{ \}$ 
+\ForAll { $\xvec_1 \in L_1$}
+	\ForAll {$j=2 \ldots k$}
+		\State $L_j^{(1)} \gets$ \Call{Filter}{$\xvec_1, L_j, \Conf_{1,j}, \eps$} 
+	\EndFor
+	
+	\ForAll {$\xvec_2 \in L_2^{(1)}$}
+		\ForAll {$j=3 \ldots k$}
+			\State $L_j^{(2)} \gets$ \Call{Filter}{$\xvec_2, L_j^{(1)}, \Conf_{2,j}, \eps$} 
+		\EndFor	
+		\State $\ddots$
+		\Indent
+			\ForAll {$\xvec_k \in L_k^{(k-1)}$}
+				\State $\Lout \gets \Lout  \union \{(\xvec_1, \ldots \xvec_k)\}$
+			\EndFor
+		\EndIndent
+	\EndFor
+\EndFor 
+
+\State{} \Return{$\Lout$} 
+\end{algorithmic}
+\vspace{10pt}
+\begin{algorithmic}[1]
+	\Function{Filter}{$\xvec, L, c, \eps$}
+		\State $L' \gets \{ \}$
+		\ForAll {$\xvec' \in L$}	
+			\If{$\abs{\ScProd{\xvec}{\xvec'} - c}  \leq \eps$}
+			 	\State $L' \gets L' \cup \{ \xvec' \}$
+			\EndIf	
+		\EndFor
+		\State{} \Return $L'$
+	\EndFunction
+\end{algorithmic}
+
+\end{algorithm}
+
+Now we are ready to describe our algorithm for the Configuration problem given in Def.~\ref{def:ConfigProblem}.
+
+On input the algorithm receives $k$ lists $L_1, \ldots, L_k$, a target configuration $\Conf$ in the form of a Gram matrix $\Conf_{i,j}=\langle{\xvec_i,}{\xvec_j}\rangle \in \R^{k \times k}$ and a small $\eps>0$.
+The algorithm proceeds as follows: it picks an $\xvec_1 \in L_1$ and filters all the remaining lists with respect to the values $\ScProd{\xvec_1}{\xvec_i}$ for all $2 \leq i \leq k$.
+More precisely, $\xvec_i \in L_i$ `survives' the filter if $\abs{\ScProd{\xvec_1}{\xvec_i} - \Conf_{1,i}}  \leq \eps$.
+We put such an $\xvec_i$ into $L_i^{(1)}$ (the superscript indicates how many filters were applied to the original list $L_i$).
+On this step, all the $k$-tuples of the form $(\xvec_1, \xvec_2, \ldots, \xvec_k) \in \{\xvec_1\} \times L_2^{(1)} \times \ldots \times L_k^{(1)}$ with the first vector $\xvec_1$ fixed partially match the target configuration. 
+Most importantly, the lists $L_i^{(1)}$ become much shorter than the original ones. 
+
+Next, we take $\xvec_2 \in L_2^{(1)}$ and create smaller lists $L_i^{(2)}$ from $L_i^{(1)}$ by filtering out all the $\xvec_i \in L_i^{(1)}$ that do not satisfy $\abs{\ScProd{\xvec_2}{\xvec_i} - \Conf_{2,i}}  \leq \eps$ for all $3 \leq i \leq k$.
+A tuple of the form $(\xvec_1, \xvec_2, \xvec_3, \ldots, \xvec_k) \in \{\xvec_1\} \times \{\xvec_2\} \times L_3^{(2)} \times \ldots \times  L_k^{(2)}$ satisfies the target configuration $\Conf_{i,j}$ for $i=1,2$. Now we have the first two vectors fixed. 
+
+We proceed with this list-filtering strategy until we have all $\xvec_i$ for $1\le i \le k$ fixed.
+We output all the survived $k$-tuples.
+Note that our algorithm becomes the trivial brute-force search algorithm once we are down to 2 lists $L_{k-1}^{(k-2)}, L_k^{(k-2)}$.
+As soon as we have fixed $\xvec_1,\ldots,\xvec_{k-2}$ and created $L_{k-1}^{(k-2)},L_{k}^{(k-2)}$, we iterate over $L_{k-1}^{(k-2)}$ and check scalar products with every element from $L_{k}^{(k-2)}$. Our algorithm is detailed in Alg.~\ref{alg:AlgConfig}.
+
+In Fig.~\ref{fig:AlgDescription}, we stress the difference between our algorithm (left) and the algorithm for the Configuration problem presented in \cite{BLS16} (right). While not being stated in terms of configurations, the BLS algorithm actually does search for tuples that form the balanced configuration but differently: for a fixed $\xvec_1$, it only filters the next list $L_2$ and the remaining $L_3, \ldots, L_k$ are left unchanged. Once $\xvec_2 \in L_2^{(1)}$ is chosen next, $L_3^{(2)}$ is obtained by applying filtering to the input $L_3$, while our Alg.~\ref{alg:AlgConfig} filters a smaller $L_3^{(1)}$. Certainly, in our approach we can miss some solutions that would be found by the BLS algorithm, but the results of Sect.~\ref{subsec:ConfigL2} show that this is a tiny fraction of solutions which vanishes in the asymptotics. To see the effect of this fact in practice, we refer the reader to Sect.~\ref{subsec:KListResults}.
+\clearpage
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.45\textwidth}
+	\begin{tikzpicture}
+	\tikzset{
+    List/.style={
+    rectangle, 
+    rounded corners, 
+    draw=black, thick,
+    minimum width=0.9cm, 
+    text centered},
+    Vertex/.style={
+  	ellipse,
+  	draw=black, thick,
+  	inner sep=1pt},
+	}
+	\matrix (m) [row sep=2mm, column sep=2.3mm, name=m] {
+		\node[List, minimum height=50pt] (L1) {$L_1$}; &
+	 	\node[List, minimum height=50pt] (L2) {$L_2$}; &
+		\node[List, minimum height=50pt] (L3) {$L_3$}; &	 	
+	 	\node[] {$\ldots$}; &
+	 	\node[List, minimum height=50pt] (Lk) {$L_k$}; \\
+	 	
+	 	\node[Vertex, label=below:{\footnotesize $\xvec_1$}] (x1) {}; &
+	 	\node[Vertex] (l12) {\tiny Filter}; &
+	 	\node[Vertex] (l13) {\tiny Filter}; &
+	 	\node[] (dots1) {}; &
+	 	\node[Vertex] (l1k) {\tiny Filter}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[List, minimum height=35pt] (L2p) {$L_2^{(1)}$}; &
+		\node[List, minimum height=35pt] (L3p) {$L_3^{(1)}$}; &	 	
+	 	\node[] {$\ldots$}; &
+	 	\node[List, minimum height=35pt] (Lkp) {$L_k^{(1)}$}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[Vertex, label=below:{\footnotesize $\xvec_2$}] (x2) {}; &
+	 	\node[Vertex] (l23) {\tiny Filter}; &
+	 	\node[] (dots2) {}; &
+	 	\node[Vertex] (l2k) {\tiny Filter}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[List, minimum height=20pt] (L3pp) {$L_3^{(2)}$}; &
+	 	\node[] {}; &
+	 	\node[List, minimum height=20pt] (Lkpp) {$L_k^{(2)}$}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {$\vdots$};\\
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[List, minimum height=17pt] (Llast1) {\small $L_{\scalebox{0.5}{ $k-1$}}^{\scriptscriptstyle(k-2)}$}; &
+	 	\node[List, minimum height=17pt] (Llast2) {\small $L_{\scalebox{0.5}{$k$}}^{\scriptscriptstyle(k-2)}$};\\
+	 	
+	 	\node[minimum height=10pt] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; & \\
+	 	
+	 	\node[minimum height=10pt] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\multicolumn{2}{r}{\node[List, minimum height=17pt] (Lout) {\small $\Lout$};} \\
+	 };
+	%\node[fit=(m-9-3)(m-9-5)] (Lout) {\small $\Lout$};
+	 \draw (L1) -- (x1);
+	 \draw[->] (x1) -- (l12);
+	 \draw[->] (L2) -- (l12);
+	 \draw[->] (l12) -- (L2p);
+	 
+	 \draw (l12) -- (l13);
+	 \draw[->](L3) -- (l13);
+	 \draw[->] (l13) -- (L3p);
+	 
+	 \draw[->] (dots1) -- (l1k);
+	 \draw[->] (Lk) -- (l1k);
+	 \draw[->] (l1k) -- (Lkp);
+	 
+	 \draw (L2p) -- (x2);
+	 \draw[->] (x2) -- (l23);
+	 \draw[->] (L3p) -- (l23);
+	 \draw[->] (l23) -- (L3pp);
+	 
+	 \draw[->] (dots2) -- (l2k);
+	 \draw[->] (Lkp) -- (l2k);
+	 \draw[->] (l2k) -- (Lkpp);
+	 
+	 \draw[->] (Llast1) -- (44pt, -112pt);
+	 \draw[->] (Llast2) -- (45pt, -112pt);	
+	 
+\end{tikzpicture}
+\caption{\footnotesize Pictorial representation of Alg.~\ref{alg:AlgConfig}. At level $i$, a filter receives as input $\xvec_i \in L_i^{(i-1)}$ and a vector $\xvec_{j}$ from $L_{j}^{(i-1)}$ (for the input lists, $L = L^{(0)}$). $\xvec_j$ passes through the filter if $\abs{\ScProd{\xvec_i}{\xvec_j} - \Conf_{i,j}}  \leq \eps$, in which case it is added to $L_{j}^{(i)}$. All the vectors from $L_j^{(i-1)}$ for all $j \leq i+1$ are processed in this manner. The configuration $\Conf$ and $\eps>0$ are global parameters.}
+\label{fig:AlgDescription}
+\end{subfigure} %
+\quad \quad
+\begin{subfigure}[t]{0.47\textwidth}
+	\begin{tikzpicture}
+	\tikzset{
+    List/.style={
+    rectangle, 
+    rounded corners, 
+    draw=black, thick,
+    minimum width=0.9cm, 
+    text centered},
+    Vertex/.style={
+  	ellipse,
+  	draw=black, thick,
+  	inner sep=1pt},
+	}
+	\matrix (m) [row sep=1.6mm, column sep=2.3mm] {
+		\node[List, minimum height=50pt] (L1) {$L_1$}; &
+	 	\node[List, minimum height=50pt] (L2) {$L_2$}; &
+		\node[List, minimum height=50pt] (L3) {$L_3$}; &	 	
+	 	\node[] {$\ldots$}; &
+	 	\node[List, minimum height=50pt] (Lk) {$L_k$}; \\
+	 	
+	 	\node[Vertex, label=below:{\footnotesize $\xvec_1$}] (x1) {}; &
+	 	\node[Vertex] (l12) {\tiny Filter}; &
+	 	\node[] (l13) {}; &
+	 	\node[] (dots1) {}; &
+	 	\node[] (l1k) {}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[List, minimum height=35pt] (L2p) {$L_2^{(1)}$}; &
+		\node[] (L3p) {}; &	 	
+	 	\node[] {$\ldots$}; &
+	 	\node[] (Lkp) {}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[Vertex, label=below:{\footnotesize $\xvec_2$}] (x2) {}; &
+	 	\node[Vertex] (l23) {\tiny Filter}; &
+	 	\node[] (dots2) {}; &
+	 	\node[] (l2k) {$\vdots$}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[List, minimum height=20pt] (L3pp) {$L_3^{(2)}$}; &
+	 	\node[] {$\vdots$}; &
+	 	\node[] (Lkpp) {}; \\
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; & \\[-1.3ex]
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[List, minimum height=17pt] (Llast1) {\small $L_{\scalebox{0.5}{ $k-1$}}^{\scriptscriptstyle(k-2)}$}; &
+	 	\node[] {};\\
+	 	
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[List, minimum height=17pt] (Llast2) {\small $L_{\scalebox{0.5}{ $k$}}^{\scriptscriptstyle(k-2)}$}; \\
+	 	
+	 	\node[minimum height=10pt] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; & \\
+	 	
+	 	\node[minimum height=10pt] {}; &
+	 	\node[] {}; &
+	 	\node[] {}; &
+	 	\multicolumn{2}{r}{\node[List, minimum height=17pt] (Lout) {\small $\Lout$};} \\
+	 };
+	 \draw (L1) -- (x1);
+	 \draw[->] (x1) -- (l12);
+	 \draw[->] (L2) -- (l12);
+	 \draw[->] (l12) -- (L2p);
+	 
+	 %\draw (l12) -- (l13);
+	 \draw[->](L3) -- (l23);
+	 \draw[->] (l23) -- (L3pp);
+	 
+	 %\draw[->] (dots1) -- (l1k);
+	 %\draw[->] (Lk) -- (l1k);
+	 %\draw[->] (l1k) -- (Lkp);
+	 
+	 \draw (L2p) -- (x2);
+	 \draw[->] (x2) -- (l23);
+	 %\draw[->] (L3p) -- (l23);
+	 %\draw[->] (l23) -- (L3pp);
+	 
+	 %\draw[->] (dots2) -- (l2k);
+	 \draw[-] (Lk) -- (l2k);
+	 \draw[->] (l2k) -- (Llast2);
+	 \draw[->] (Llast1) -- (44pt, -112pt);
+	 \draw[->] (Llast2) -- (45pt, -112pt);	
+\end{tikzpicture}
+\caption{\footnotesize The $k$-List algorithm given in \cite{BLS16}. The main difference is that a filter receives as inputs $\xvec_i$ and a vector $\xvec_j \in L_j$, as opposed to $\xvec_j \in L_j^{(i-1)}$. Technically, in \cite{BLS16}, $\xvec_i$ survives the filter if $\normalabs{\ScProd{\xvec_i}{\xvec_1+\ldots+\xvec_{i-1}}} \geq c_i$ for some predefined $c_i$. Due to our concentration results, this description is equivalent to the one given in \cite{BLS16} in the sense that the returned solutions are (up to a sub-exponential fraction) the same.}
+\label{fig:AlgBLS}
+\end{subfigure}
+\caption[$k$-List algorithms for the Configuration problem]{$k$-List Algorithms for the Configuration Problem (Def.~\ref{def:ConfigProblem}). Left: Our Alg.~\ref{alg:AlgConfig}. Right: The algorithm from \cite{BLS16}}
+\end{figure}
+
+\clearpage

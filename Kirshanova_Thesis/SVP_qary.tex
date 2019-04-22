@@ -1,0 +1,32 @@
+%\begin{center}
+%\rule[0pt]{\textwidth}{1pt}\\[7pt]
+%{\LARGE {This chapter is due}}
+%\rule[0pt]{\textwidth}{1pt}
+%\end{center}
+\section{Approximate \SVP on a $q$-ary lattice} 
+\label{sec:ApproxQary}
+
+In this section we present a combinatorial algorithm that solves the approximate shortest vector problem, $\appSVP$, on a $q$-ary lattice. As opposed to the algorithm from the previous section where the approximation factor $\gamma$ was a constant, here $\gamma$ is polynomial in the lattice-dimension, i.e.\ we look for a vector $\vvec$ from $\qLat \subset \Z_q^n$ s.t.\ $\| \vvec \| \leq \poly(n) \lambda_1(\qLat)$.
+
+An algorithm for $\appSVP$ with a polynomial approximation factor gives a way to solve the so-called Short Integer Solution Problem (\SIS) -- the problem introduced by Ajtai in \cite{STOC:Ajtai96} that serves as the foundation for a variety of cryptographic primitives. Given a matrix $\AMat \in \Z_q^{n \times m}$ composed column-wise from uniformly chosen $\avec_i \in \Z_q^n$, \SIS asks to find a short $\vvec \in \Z_q^m$ s.t.\ $\AMat \vvec = 0 \mod q$. The length condition is specified by an input parameter $\beta$, i.e. the output $\vvec$ must satisfy $\| \vvec \| \leq \beta$, where $ \beta=\poly(n)$ and the degree of the polynomial depends on the modulus $q$. Note that we are not interested in the trivial solution $\vvec = (q, 0, \ldots, 0)$. Also notice that if we ask for $\vvec \in \ZO{n}$, \SIS becomes the vectorial Subset Sum Problem.
+
+To see the connection between \SIS and the approximate \SVP, let us consider an $m$-dimensional $q$-ary lattice $\qLATTp(\AMat) = \{ \xvec \in \Z^m \colon \AMat \xvec = 0 \mod q \}$. A solution to $\appSVP$ on $\qLATTp(\AMat)$ is a vector $\vvec \in \qLATTp(\AMat)$ of length $\|\vvec \| \leq \gamma \lambda_1(\qLATTp(\AMat))$ and therefore, it is a solution to the \SIS problem when $\gamma$ is appropriately chosen. From Minkowski's bound we know that $\lambda_1(\qLATTp(\AMat) \leq \sqrt{m} q^{n/m}$. Hence, if we set $q=\bigO(n^{\cq})$ (as we did in Chap.~\ref{chap:LWEasBDD} for the analysis of \LWE), $\gamma  = \bigO(n^{\cg})$ for constants $\cq>1, \cg$, and take $m = \TLandau(n)$, a solution for $\appSVP$ will be a vector of length $\|\vvec \| \leq n^{\cg + \cq/2 + 1/2}$. Values of $\cg$ stem from the connection of \SIS to the worst-case lattice-problems. Since Ajtai's proof, the constant has been improved from the original $\cg=8+\smallo(1)$ \cite{STOC:Ajtai96} down to $\cg=2.5+\smallo(1)$ in \cite{Mic05} and, finally, to $\cg=1+\smallo(1)$ in \cite{FOCS:MicReg04}. In the language of \SIS, $\cg$ is known as Ajtai's connection factor.
+
+We have a natural restriction on $\cg$ that comes from the fact that we want to avoid trivial solutions of length $q$, namely $\cg<\cq/2 - 1/2$. 
+
+Notice that we already mentioned $\appSVP$ in Sect.~\ref{sec:OtherAttacks} when we discussed the so-called $\Dual$ attack on \LWE. The name of the attack comes from the fact that the two problems, \LWE and \SIS, are `dual' to each other. What it means is that the \LWE problem -- the decoding problem on $\Lat(\AMat\transpose)$ -- can be solved using a \SIS oracle for $\AMat$ (or, equivalently, an oracle for $\appSVP$ on $\qLATTp(\AMat)$) as we have already seen in Alg.~\ref{alg:Dual}, Chap.~\ref{chap:LWEasBDD}. The two lattices, $\Lat(\AMat\transpose)$ and $\qLATTp(\AMat)$, are dual to each other up to scaling by $q$: $\qLat(\AMat\transpose)^* = \frac{1}{q} \qLATTp(A)$, $\qLATTp(A)^* = \frac{1}{q}\qLat(\AMat\transpose)$.  
+We refer the reader to \cite{Mic10} for more interesting outcomes of this duality.
+
+In the following sections we present two combinatorial algorithms for $\appSVP$ on $\qLATTp(\AMat)$ in case $\gamma =\poly(n)$. The second algorithm has a better constant in the running time exponent. Next, we compare our algorithms with the \BKZ reduction run on $\qLATTp(\AMat)$ when the block-size $\beta$ is chosen s.t.\ the first vector of the reduced basis is a solution to $\appSVP$. We conclude that our improved algorithm outperforms \BKZ for some values of $\cq, \cg$ even when $\BKZ$ is instantiated with the best known heuristic \SVP oracle.
+
+
+\input{qAryAlg}
+
+\input{qAryAnalysis}
+
+\input{qAryAlgImproved}
+
+\input{qAryImprovedAnalysis}
+
+\input{ComparisonWithBKZ}
+%\input{Re-evaluatingLWEComplexity}

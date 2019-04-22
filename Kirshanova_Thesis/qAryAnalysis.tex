@@ -1,0 +1,60 @@
+\subsection{Analysis} \label{subsec:qAryAnalysis}
+
+It is reasonable to assume that the above algorithm for $\appSVP$ on a $q$-ary lattice, as all known \BKW-type algorithms for \LWE, has both running time and memory complexity of the form $2^{(\const+\smallo(1) )n}$ for some constant $\const$. The goal of this section is to determine $\const$ as a function of input parameters: $\cg$, where $\gamma = \bigO(n^{\cg})$, and $\cq$, where $q = \bigO(n^{\cq})$. We consider average-case instances, and our analysis will show the \emph{expected} running time and memory.
+
+Let us elaborate more on the running-time/memory trade-off achieved by the algorithm. Recall that on step $i$, one entry of table $T$ represents one bucket which is one of the small cubes $[-R_i/2, R_i/2]^{\ell_i}$ inside a large cube $[-\frac{q-1}{2}, \frac{q-1}{2}]^{\ell_i}$ (see Fig.~\ref{fig:Bucketing}). We expect to have all entries of $T$ be filled after we have bucketed ($\#$buckets)-many lattice vectors from $L_{i-1}$ (here we use the fact that elements from $L_{i-1}$, subjected on block $\ell_i$, are uniformly distributed in $[-\frac{q-1}{2}, \frac{q-1}{2}]^{\ell_i}$). Hence, after bucketing ($2 \cdot \#$buckets)-many lattice vectors from $L_{i-1}$, we expect to put ($\#$buckets)-many lattice vectors into $L_i$. Overall, the lists get shorter by at least a factor of $2$ per level. After $k$ levels, we expect $|L_k| = \TLandau(2^{-k} |L_0|)$. 
+
+The analysis below reveals $k = \TLandau(\log n)$, and hence, the output list $L_k$ is expected to be only $\poly(n)$-times shorter than the initial list $L_0$. We shall see in the proof that the number of buckets on each level will be exponential in $n$, hence, to find even one collision on step $i$, we need exponentially many lattice vectors in the list $L_{i-1}$. So we ignore $\poly(n)$-factors coming from the fact that we lose approximately half of the list on each step. Also, the amount of computations we perform per bucket is only $\bigO(n)$ as we add up two $n$-dimensional vectors. Thus, both the expected running time and memory complexity are equal (up to $\poly(n)$-factors) to the number of buckets. Exactly the same arguments apply to \BKW algorithms for \LWE.
+
+Intuitively, it would be beneficial to take the number of steps $k$ large as it leads to shorter block-lengths $\ell_i$'s which, in turn, speeds up the collision-finding. However, we have to set $k$ as low as $k = \TLandau(\log n)$ where the constant in $\TLandau$-notation will ultimately depend on $\cg$ and $\cq$. This bound comes from the fact that each time we perform addition of two vectors that happen to lie in the same bucket, the $\ell_{\infty}$-norm of the resulting vector on \emph{already considered} blocks $\ell_1, \ldots, \ell_{i-1}$ increases (on average) by a factor of $\sqrt{2}$. So shortening the $\ell_{\infty}$-norm from $q$ down to $\sqrt{2}R_i$ on a block enlarges the $\ell_{\infty}$-norm of the vector by $\sqrt{2}$ on the right-hand side blocks. This growth is depicted in Fig.~\ref{fig:appSVPAlg}. At the end, on the coordinate block $[d_{i-1}, \ldots, d_{i}]$ of length $\ell_i$, we have $\| [\vvec\mkern3mu]_{d_i}^{d_{i-1}} \|_{\infty} \leq 2^{\frac{k-i+1}{2}} R_i $ for $\vvec \in L_k$. Hence our choice for $k$ is restricted by the upper bound of the Euclidean length of $\vvec$ we should output. This situation should be compared with the error-growth in the \BKW algorithm for \LWE that puts a bound on $k$ of the same order.
+
+%The number of buckets on step $i$ is given by the fraction of the two volumes of cubes $\#$buckets$= \frac{\vol([-\frac{q-1}{2}, \frac{q-1}{2}]^{\ell_i})}{\vol([-R_i/2, R_i/2]^{\ell_i})} = (\frac{q}{R_i})^{\ell_i}$.
+
+In the proof below we show how to set the block-lengths $\ell_i$'s, the $\ell_\infty$-norm bounds $R_i$'s, and the number of steps $k$.
+\begin{thm} \label{thm:appSVP}
+	Algorithm~\ref{alg:ApproxSVP} on input (1) a lattice-basis $\DMat \in \Z_q^{2n \times 2n}$ as in Eq.~(\ref{eq:BasisD}) for the lattice $\qLATTp(A)$ with $q = \bigO(n^{\cq})$ and (2) an approximation factor $\gamma = \bigO(n^{\cg})$, outputs a vector $\vvec \in \qLATTp(A)$ of length $\|\vvec \| \leq n^{\cg+\cq/2 + 1/2}$ in expected time $T(\appSVP)=2^{(\const+\smallo(1)) n}$, where
+	\begin{equation} \label{eq:AppSVPRT}
+		\const = \tfrac{1}{2 \ln \big( \frac{\cq}{\cq/2-\cg} \big)}.
+	\end{equation}
+\end{thm}
+
+\begin{proof}
+	The expected running time to fill up all the buckets on step $i$ and, thus, to create the list $L_{i}$ is determined by the number of buckets or, equivalently, the number of $\ell_i$-dimensional cubes $[-R_i/2, R_i/2]^{\ell_i}$ that `fit' inside the large cube $[-\frac{q-1}{2}, \frac{q-1}{2}]$. This number is given by the fraction of the two volumes:
+	\[
+		\E[\#\text{buckets on level } i]= \frac{\vol([-\frac{q-1}{2}, \frac{q-1}{2}]^{d_i})}{\vol([-R_i/2, R_i/2]^{d_i})} = \TLandau \Big( \Big(\frac{q}{R_i}\Big)^{d_i}\Big).	
+	\]
+	This is (up to $\poly(n)$-factors) the expected running time of the inner for-loop (line \ref{algline:ForLoop2}).
+	As we show below, the number of steps $k$ will be of size $k = \TLandau(\log n)$ and hence, the outer for-loop on line \ref{algline:ForLoop1} in Alg.~\ref{alg:ApproxSVP} contributes to the running time only by a $\poly(n)$-factor. 
+	
+	Thus, asymptotically, we have $\big(\frac{q}{R_i}\big)^{d_i} = 2^{\const n}$, from where it follows that 
+	\begin{equation} \label{eq:d_i}
+		d_i = \frac{\const n}{\log q - \log R_i}.
+	\end{equation}
+	
+	Additionally, we have $\sum_{i=1}^k d_i = n$. We shall conclude on $\const$ from these two equations.
+	
+	But before doing that let us get an upper-bound for $k$. The expected length of vector $\vvec$ in the list $L_k$ is upper-bounded as $\| \vvec \| \leq \sqrt{2 R_k^2 d_k + 4 R_{k-1}^2 d_{k-1} + \ldots + 2^{k-1} R_2^2 d_2 + 2^k R_1^2 d_1 + 2^k R_1^2 n}$. It is easy to verify (see also Fig.~\ref{fig:appSVPAlg}) that if we set $R_{i+1} = \sqrt{2} R_i$, the first $k$ summands in our bound on $\|\vvec \|$ contribute to the total sum equally. Finally, we obtain $\| \vvec \| \leq \sqrt{2 2^{k} R_1^2 n}$. This bound should be less than $n^{\cg +\cq/2 +1/2}$. If we set the first bound $R_1$ as small as $R=n^{\smallo(1)}$, the inequality $\sqrt{2 2^{k} R_1^2 n} \leq n^{\cg +\cq/2 +1/2}$ leads to $k \leq 2 (\cg+\cq/2 + \smallo(1)) \log n$. We take the upper bound as the value for $k$.  
+	
+	Since we set $R_i = \sqrt{2}^{i-1} R_1$, we now can compute the sum $\sum_{i=1}^k d_i$ as
+	\[	
+	\sum_{i=1}^{k} \frac{\const n}{\log \tfrac{q}{ R_1} - \tfrac{1}{2}(i-1)} \leq  \int\limits_{i=0}^{k-1} \frac{\const n  \d i}{\log (\tfrac{q}{ R_1}) - \tfrac{1}{2}i} = - 2\const n \Big( \ln(\log \tfrac{q}{ R_1} - \tfrac{1}{2}i) \Big|_0^{k-1} \Big) = 2\const n \ln \Big( \frac{\log \tfrac{q}{ R_1}}{\log \tfrac{q}{ R_1} - \tfrac{1}{2} (k-1)} \Big).
+	\]
+	The error that comes from approximating the sum by the integral contributes to the $\smallo(1)$-term in the exponent.
+	From the facts that all $d_i$'s sum up to $n$, $k=2 (\cg+\cq/2)\log n$, and $R_1 = n^{\smallo(1)}$, we obtain
+	\[\const = \frac{1}{2 \ln \big( \tfrac{\cq}{\cq/2-\cg} \big)} +\smallo(1).\]
+	\vspace{-13pt}
+\end{proof}
+
+\begin{remark}\label{rmk:Linm}
+	From the proof above, it is easy to deduce that for $m=\cm \cdot n$, $\cm = \TLandau(1)$
+ 	\[
+		\const = \frac{\cm -1 }{2 \ln \big( \frac{\cq}{\cq (1-1/\cm) - \cg} \big)}.
+	\]
+\end{remark}
+We conclude the discussion on the algorithm with a couple of remarks.
+	\begin{itemize}
+		\setlength{\itemsep}{0pt}
+		  \setlength{\parskip}{0pt}
+		\item \textbf{Connection to \BKZ algorithms.} An important property of our $q$-ary lattice $\qLATTp(A)$ we are exploiting in this algorithm is the \emph{orthogonal} sub-lattice $q\Id_n \subset \qLATTp(A)$. We can view each bucketing step as projection of vectors onto the $q$-ary vectors $\{(q, 0, \ldots, 0), \ldots (0, 0, \ldots, q)\}$ first, then performing the summation, and finally `lifting' the result. Since the sub-lattice is orthogonal, the lifting is simply a coordinate-wise $\bmod q$ operation. This allows us not to worry about the $\ell_{\infty}$-norm on the left-most coordinates where the bucketing was not yet performed as we implicitly assume the $\bmod~q$ operation. The algorithm can be thought of as a special kind of $\BKZ$-reduction, where, instead of projecting on short and non-orthogonal vectors, we project on long but orthogonal vectors. Also, as opposed to a $\BKZ$ algorithm where the block-size is fixed to $\beta$, our $d_i$'s differ. Further, our blocks do not intersect similar to the $\BKZ$ slide-reduction.\\
+		\item \textbf{Connection to \BKW algorithms}. As we already mentioned, the presented algorithm is a re-formulation of the \BKW algorithms of \cite{C:KirFou15, C:GuoJohSta15} to $\appSVP$. The fact that we can `save' half of the dimension, $n$, by switching to the systematic form of the generator matrix $\AMat$ is no surprise: solving \LWE directly with \BKW (not via lattices) does not have this additional $n$ at all. 
+	\end{itemize}

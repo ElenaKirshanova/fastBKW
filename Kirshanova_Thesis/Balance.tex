@@ -1,0 +1,52 @@
+\subsection{Total complexity of \LWE decoding} \label{sec:Balance}
+
+The \BDD attack on \LWE is a two-phase algorithm: the enumeration (phase 2) in performed on a $\beta$-\BKZ reduced basis (phase 1). So far we have been discussing the second phase -- enumeration -- ignoring the complexity of the reduction. By now we have the quantity $\rho(\ENUM) = \frac{T(\ENUM)}{\Psucc(\ENUM)}$, and we can finally turn our attention to the total complexity of the attack taking into account the reduction: $\rho(\BDD) = \frac{T(\BKZ)+T(\ENUM)}{\Psucc(\ENUM)}$.
+
+$T(\BKZ)$ is determined by the input parameter $\beta$ or, more precisely, by the running time of an \SVP-solver on a lattice of dimension $\beta$ (the dimension of the original lattice -- $m$ for \LWE -- only affects a polynomial factor in $T(\BKZ)$). We have already mentioned two ways to instantiate an \SVP-solver in Chap.~\ref{sec:PrelimLattices}:
+	\begin{itemize}
+		\item[--] $T(\BKZ) = 2^{\cBKZ \cdot \beta \log \beta + \smallo(\beta \log \beta) }$ with $\poly(\beta)$ space complexity due to Kannan \cite{STOC:Kannan83} for $\cBKZ = \TLandau(1)$ (Hanrot and Stehl\'{e} in \cite{C:HanSte07} estimate $\cBKZ = \tfrac{1}{2e}$),
+		\item[--] $T(\BKZ) = 2^{\cBKZ \cdot \beta  + \smallo(\beta)}$ with $2^{\bigO(\beta)}$ memory due to Micciancio-Voulgaris \cite{STOC:MicVou10} and Aggarwal et al.\ \cite{STOC:ADRS15} (for the former, $\cBKZ = 2$, and for the latter $\cBKZ = 1$; the space complexity is $2^{\beta + \smallo(\beta)}$ for both algorithms).
+	\end{itemize}  
+	
+From now on, we ignore the $\smallo(\cdot)$-terms in the exponents. The above two cases result into two statements for the complexity of the \BDD attack. We start with Kannan's \SVP. We make a distinction between enumerations that achieve a constant success probability (Lindner-Peikert $\NPs$, Spherical or Linear-Length Pruning) and those that have an arbitrarily small success probability (Babai's $\NP$, Extreme Pruning).
+As in the previous sections, we assume the \LWE error follows a continuous Gaussian distribution with parameter $\alpha q$.
+\begin{thm}[Super-exponential \BDD-attack on \LWE] \label{thm:BalanceSuperExp}
+	The \LWE problem with parameters $(n, q=\bigO(n^{\cq})$, $\alpha = \bigO(1 / n^{\ca}) )$ where $\cq, \ca = \TLandau(1)$, can be solved via \BDD with (1) a $\beta=\TLandau(n)$-basis reduction running in time $2^{\cBKZ \beta \log \beta}$ and (2) any enumeration algorithm $\ENUM \in \{ \GenPrun, \NPs \}$ using the optimal choice of $m = \left( \frac{2 \cq}{\sqrt{2 \cBKZ}+\ca} + \smallo(1) \right) \cdot n$ samples in time 
+\begin{align*}
+		T(\BDD) = 2^{ \left( \cBKZ \cdot \frac{2 \cq}{(\sqrt{2 \cBKZ}+\ca)^2} \right) \cdot n \log n},
+\end{align*}
+	if $\Psucc(\ENUM) = 1 - \smallo(1)$. For arbitrary $\Psucc(\ENUM)$, the above quantity is a lower bound for $\rho(\BDD)$.
+\end{thm}
+
+\begin{proof}
+	Assume we run an enumeration algorithm with $\Psucc(\ENUM) = 1 - \smallo(1)$. Investing more time in the reduction (i.e.\ improving the quality of the output basis) results in a faster enumeration, so the total running time $T(\BDD) = T(\BKZ)+ T(\ENUM)$ is minimized if the two phases are balanced. Thms.~\ref{thm:LPRunTime} resp.\ \ref{thm:GenPrunRunTime} give $T(\NPs)$ resp.\ $T(\GenPrun)$. On the logarithmic scale, the balancing condition $T(\BKZ) = T(\ENUM)$ is equivalent to (omitting the $\smallo(1)$-terms)
+	\[
+		\frac{1}{2} \left( \frac{m}{2 \beta} + \frac{n}{m} \cq - \ca \right)^2 \beta \log \beta = \cBKZ \beta \log \beta.
+	\]
+	This equation yields $\beta = \frac{1}{2} \frac{m}{\sqrt{2 \cBKZ}-(n/m)\cq + \ca}$. This expression attains its minimum at $m = \frac{2 \cq}{\sqrt{2 \cBKZ} + \ca}$, from where the first theorem statement easily follows. Note that for a constant success probability of enumeration, $\rho(\BDD) = \TLandau(T(\BDD))$.
+	
+	For arbitrary $\Psucc(\ENUM)$, we have $\rho(\BDD) = \frac{T(\BKZ)}{\Psucc(\ENUM)}+\rho(\ENUM) \geq T(\BKZ) + \rho(\ENUM)$, and we have just computed $T(\BKZ) + \rho(\ENUM)$. 
+\end{proof}
+
+Now we consider the case when a lattice-basis reduction has a \emph{single} exponential complexity $2^{\cBKZ \cdot \beta}$. Recall Thm.~\ref{thm:GenPrunRunTime} shows that for $\ENUM =  \GenPrun$, $\rho(\ENUM) = 2^{\TLandau(\beta \log \beta)}$. Cor.~\ref{cor:BabaiAndLP} states the same trade-off for the Babai's $\NP$ and Lindner-Piekert $\NPs$ algorithms.
+
+So asymptotically, it is optimal to reduce the input basis to a point where the cost of enumeration switches from super-exponential to polynomial since in this case, $T(\BDD)$ is dominated by the reduction and stays singe-exponential. In the next theorem, we find a value of $\beta$ for which the reduction phase will produce a basis required for a $\poly(m)$-time enumeration that will produce the correct output with success probability almost 1. This enumeration may be either the Babai's $\NP$, Lindner-Peikert $\NPs$ or any (reasonable) pruning strategy with $\poly(m)$ number of nodes. 
+
+\begin{thm}[Single-exponential \BDD-attack on \LWE] \label{thm:BalanceSingleExp}
+	The \LWE problem with parameters ($n$,\linebreak $q=\bigO(n^{\cq})$, $\alpha = \bigO(1 / n^{\ca}) $) where $\cq, \ca = \TLandau(1)$ can be solved via \BDD with (1) a $\beta= \Bigl( \frac{2 \cq}{\ca^2} + \smallo(1) \Bigr) \cdot n$-basis reduction running in single-exponential time $2^{\cBKZ \beta}$ and (2) $poly(m)$-time enumeration algorithm using the optimal choice $m = \left( \frac{2 \cq}{\ca} + \smallo(1) \right) \cdot n$ of samples in time
+	\[
+		T(\BDD) = 2^{ \Bigl(\cBKZ \cdot \frac{2 \cq}{\ca^2} + \smallo(1) \Bigr) \cdot n}
+	\]
+	with $\Psucc(\BDD) = 1 - \smallo(1)$.
+\end{thm}
+
+\begin{proof}
+ To guarantee a constant success probability and polynomial running time for enumeration, we need to ensure that the last Gram-Schmidt vector of the basis returned by $\beta$-reduction satisfies $\|  \wbvec_m\| > \alpha q$. This is equivalent to (cf.\ Cor.~\ref{cor:BabaiAndLP}) $\frac{m}{2 \beta} - \ca + \frac{n}{m}\cq  < 0$, so $\beta$ must be set as
+ \[
+ 	\beta > \frac{1}{2} \frac{m}{\ca - \cq \cdot n/m}. 
+ \]
+ 
+ This value is minimized for $m = \frac{2 \cq}{\ca}$ yielding $\beta > \frac{2 \cq}{\ca^2} \cdot n$. The theorem statement follows directly from plugging this value in the running time of the reduction. 
+\end{proof}
+
+This theorem concludes the discussion on the two-phase \BDD attack on \LWE. In the following section, we briefly discuss some other lattice-based methods to solve \LWE.

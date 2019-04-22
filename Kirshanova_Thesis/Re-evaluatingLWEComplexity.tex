@@ -1,0 +1,19 @@
+\subsection{Combinatorial \DUAL and \BKW attacks on \LWE are equivalent} \label{subsec:ReEvalLWE}
+
+In this section we return to the complexity of the Learning with Errors problem -- the question we already addressed in Chap.~\ref{chap:LWEasBDD}. In particular, we re-evaluate the complexity of the \DUAL attack on \LWE described in Sect.~\ref{sec:OtherAttacks} in the light of algorithms for $\appSVP$ presented in previous sections.
+
+Recall briefly the \DUAL attack on \LWE with parameters $n, q = \bigO(n^{\cq}), \alpha = \bigO(n^{-\ca})$. Given $m=2n$ \LWE samples in a matrix form $(\AMat, \bvec = \AMat\transpose \svec + \evec \bmod q) \in \Z_q^{n \times 2n} \times \Z_q^{2n}$, we construct a basis $\DMat$ for the lattice $\qLATTp(\AMat)=\{ \xvec \in \Z_q^{2n} \colon \AMat \xvec = \zerovec \bmod q \}$. It is easy to verify that the matrix given in Eq.~\eqref{eq:BasisD} forms such a basis. The goal of the \DUAL attack is to find a short vector $\vvec \in \qLATTp(\AMat)$, in particular, $\|\vvec \| \leq \bigO(n^{1/2+\ca - \eps})$ for some small $\eps>0$. Once found, we compute $\ScProd{\vvec}{\bvec}$. The result of this inner-product has bias $\delta = 2^{-\bigO(n^{1-\eps})}$, so we can construct a distinguisher (see, for instance, \cite{EC:DucTraVau15} for such a construction) to solve decisional \LWE (see Def.~\ref{def:decLWE}) with success probability $\delta$. In order to use search-to-decision reduction for \LWE \cite{EC:MicPei12}, we boost the success probability of the distinguisher to $1-\smallo(1)$ by finding $\delta^{-2}$-many short $\vvec$'s and verifying $\ScProd{\bvec}{\vvec}$.
+
+In Sect.~\ref{sec:OtherAttacks}, we run a \BKZ reduction algorithm on $\DMat$ to find $\vvec$. The complexity of the \DUAL attack is given in Thm.~\ref{thm:DualSearch} (see also Table~\ref{table:compareTable}). The following simple lemma shows that if instead of \BKW, we use Algorithm~\ref{alg:ApproxSVP} to find $\vvec$, we end up with the complexity that matches the running time of a $\BKW$-type algorithm for \LWE by Guo et al.\ \cite{C:GuoJohSta15} and Kirchner-Fouque \cite{C:KirFou15}. We denote this attack $\DualC$.
+
+\begin{lemma}[\DUAL attack with combinatorial $\appSVP$]\label{lem:LWEDualComb1}
+	The \emph{search}-\LWE problem with parameters $(n, q=\bigO(n^{\cq}), \alpha = \bigO(1 / n^{\ca}) )$ where $\cq, \ca = \TLandau(1)$ that satisfy $\ca>\cq/2$, and $m=\Theta(n)$ \LWE samples, can be solved with the $\appSVP$-solver run given in Alg.~\ref{alg:ApproxSVP} in time $T(\DualC) = 2^{(\const+\smallo(1))\cdot n} $, where
+	\[
+		 \const = \frac{1}{2 \ln \big( \tfrac{\cq}{\cq-\ca} \big) },
+	\]
+	with $\Psucc(\DualC) = 1- \smallo(1)$.
+\end{lemma}
+
+\begin{proof}
+	In order to find $\vvec \in \qLATTp(\AMat)$ of length $\| \vvec \| \leq $, we run Algorithm~\ref{alg:ApproxSVP} with the approximation parameter $\cg = $ 
+\end{proof}

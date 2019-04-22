@@ -1,0 +1,29 @@
+\section{Practical Hardness of \LWE} \label{sec:LWEasBDDPr}
+
+In this section we leave asymptotics and draw our attention to the practical hardness of the Learning with Errors problem. 
+
+The results of the previous section tell us that the two-phase $\BKZ+\ENUM$ approach to solve \LWE in $\poly(n)$-memory regime performs better than $\DUAL$ or Embedding attacks when only $\TLandau(n)$ samples are provided. Moreover, it is only slightly worse than the $\DUAL$ algorithm when the latter can access exponentially many samples. So in the most realistic scenario -- $\poly(n)$ memory, limited number of samples -- \BKZ reduction followed by enumeration is the right strategy.
+
+We already saw in Thm.~\ref{thm:BalanceSuperExp} that in the two-phase algorithm $\BKZ+\ENUM$, both steps have complexities of order $2^{\TLandau(n \log n)}$ since the \BKZ parameter $\beta$ optimizes the attack when $\beta = \TLandau(n)$, where we made the constant for $\beta$ explicit. 
+
+These arguments are well-suited to conclude on the asymptotics. On the practical side, however, the $\BKZ$ algorithm is notoriously hard to implement and until very recently\footnote{On the 22.09.16, Albrecht et al. announced \cite{fplll} the release of the \BKZ 2.0 algorithm, which asymptotically meets the desired $2^{\bigO(n \log n)}$ complexity.}, the only available implementation of lattice-basis reduction was provided in Shoup's NTL library \cite{Sho} and most of the complexity benchmarks (\cite{APS15,MicReg09,EC:NguReg06}) were obtained by running this implementation. During the execution, the \BKZ algorithm in NTL calls Fincke-Pohst enumeration \cite{FinPoh83} as an \SVP solver. The running time of this enumeration procedure is of order $2^{\bigO(\beta^2)}$, thus resulting in much worse complexity for the reduction than theory suggests.
+
+So it is reasonable to try to shift the workload of our \BDD attack from the reduction to the enumeration phase. This approach is even more advantageous once we notice that the enumeration algorithm -- a tree-traversal routine -- is amenable to efficient parallelization. 
+
+In this section, we present the real running times of the \BKZ+\ENUM attack on \LWE with our parallelized implementation of the enumeration step.\footnote{The code is available on-line: \url{https://github.com/pfasante/cvp-enum}} The experiments are carried out in combination with the \BKZ algorithm from the NTL library. We note that, to perform the attack, one can use any other \BKZ implementation to preprocess a basis and then run our enumeration algorithm.
+
+From our experimental results we draw two main conclusions: (1) the \BDD enumeration algorithms described in Sect.~\ref{sec:LWEasBDDAs} can be almost perfectly parallelized by splitting the enumeration tree into sub-tress and traversing the sub-trees in parallel; (2) the combinatorial $\BKW$-type attacks (\cite{C:GuoJohSta15, C:KirFou15}) are \emph{not} better in practice than the lattice-based attacks even for parameters favorable for the former (e.g.\ small or even binary secret).  We emphasize on \emph{practical} superiority of the lattice-based methods over combinatorial despite the fact that asymptotics might present a different picture (cf.\ Table~\ref{table:compareTable}, Fig.~\ref{fig:LWEPlots}). %Hence, in order to estimate practical hardness of concrete \LWE instances, one should focus on lattice-based attacks. 
+
+The roadmap of this subsection is as follows. First, we describe a single-threaded tree-traversal enumeration algorithm. Next, we show how to distribute the traversal of sub-trees among several threads to execute it in parallel. We discuss certain tweaks of the \BDD attack one can apply to variants of \LWE. At the end, we present complexities of real-time attacks on concrete \LWE instances (see Table~\ref{tabel:RunTimesLWE}).
+
+\input{SingleThread}
+
+\input{MultiThread}
+
+\input{AttacksOnLWEVariants}
+
+\input{DetailsOnImpl}
+
+\clearpage
+
+\input{LWEChallenge}

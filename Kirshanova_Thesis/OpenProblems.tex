@@ -1,0 +1,24 @@
+There are several open problems that emerge from the results presented here. These are interesting directions that can be taken for future work.
+\begin{center}
+	\textbf{Open problems from Part I}
+\end{center} 
+
+\begin{itemize}
+	\item Throughout the whole asymptotical analysis of the Learning with Errors problem, we assumed certain \emph{polynomial} dependencies between parameters $(n, q, \alpha)$, While this is the most relevant case for cryptography, it would be interesting to see how the complexity changes if we choose, for example, a sub-exponential $q = 2^{\sqrt{n}}$. Note that a similar regime has been recently studied for problem a closely related to \LWE, the NTRU problem \cite{C:AlbBaiDuc16}.  The NTRU problem in case $q = 2^{\sqrt{n}}$ becomes significantly easier. For \LWE the answer will certainly depend on the third parameter, $\alpha$. %Furthermore, the geometry of $\LWE$-lattice is significantly different from the geometry of the NTRU lattice (in particular, the for $\LWE$ the successive minima of the $\LWE$ lattice are not equal), so the other recent result on NTRU by Kirchner-Fouque \cite{},
+	\item On a practical side, the following question is relevant: how much can we lower $q$ while preserving the value $q\alpha$ (i.e.\ the width of the \LWE error)? Small $q$ would reduce the bandwidth of \LWE-based protocols. While a small modulus is unlikely to be favourable for lattice-based attacks, combinatorial attacks (even naive brute-force for very small $q$) can gain a reasonable speed-up and may become practical (in terms of the memory-complexity) once the modulus is set to be very small.
+\end{itemize}
+
+	
+	
+\vspace{7pt}
+\begin{center}
+	\textbf{Open problems from Part II}
+\end{center} 
+
+\begin{itemize}
+	\item We have already mentioned a couple of open questions that emerged from our memory efficient $k$-List \SVP algorithm: how to analyze our Algorithm~\ref{alg:AlgConfig} for a non-fixed $k$? How our algorithm will improve if we allow to use \emph{more} memory, e.g.\ for building hash-tables like it is done in previous sieving algorithms for $\SVP$ \cite{C:Laarhoven15}? From the practical side, parallelizing our Algorithm~\ref{alg:3GaussSieve} seems to be an important but a very non-trivial task.
+	\item Naturally, we would want to transfer our $k$-List algorithm for the Euclidean spaces to domains with other metrics, e.g., consider binary vectors and Hamming distance. Decoding random linear codes over $\F_2^n$ would be an application for such an algorithm. 
+	\item Our combinatorial algorithms for $\appSVP$ open up several questions as well. Recall that in Algorithm~\ref{alg:ApproxSVPImprived}, we used a rather specific way to partition the coordinates and bucket them accordingly (see Fig.~\ref{fig:appSVPAlgImproved}). We do not know whether this choice is optimal. We chose to perform the `additional' bucketing on blocks of length $\bigO(n/ \log n)$ as our analysis showed that bucketing on blocks of length $\bigO(n)$ does not seem to improve the algorithm.
+	
+	Finally, the same technique as to our Algorithm~\ref{alg:ApproxSVPImprived} should bring an improvement for \BKW algorithms on \LWE as these are the same $k$-List problem. Our way to shorten the length during the bucketing can be converted to a method that decreases the error-growth in the \BKW algorithm. The impact of such algorithms on \LWE is left open.
+\end{itemize}

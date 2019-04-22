@@ -1,0 +1,133 @@
+\section{Lattices} \label{sec:PrelimLattices}
+
+In this chapter, we present basic definitions and algorithms associated to lattices. We give only the necessary definitions and facts that concern lattices and the Learning with Errors problem. There is a rich variety of surveys on lattices in cryptography and on \LWE in particular. To name a few, lecture notes of Regev \cite{LecNotes} and a recent survey by Peikert \cite{Pei16} offer a comprehensive overview on lattice-based cryptography.
+
+A (full-rank) lattice $\Lat \subset \R^n$ is the set of all integer linear combinations of $n$ linearly independent vectors $\BMat = (\bvec_1, \ldots, \bvec_n)$. 
+These vectors form a \emph{basis} of the lattice. 
+A basis is not unique: for any unimodular $\UMat \in \Z^{n \times n}$, $\BMat \UMat$ is another basis. 
+We write $\Lat(\BMat)$ when we want to stress that the lattice is represented by a basis $\BMat$. 
+The \emph{fundamental region} of $\Lat(\BMat)$ is $\FP(\BMat) = \{ \sum_{i=1}^n c_i \bvec_i\colon c_i \in [-\tfrac{1}{2}, \tfrac{1}{2}) \}$. 
+Its volume, known as the volume of $\Lat(\BMat)$, equals to $|\det(B)|$ and is independent of the choice of basis. We denote this value $\det \Lat$. We let $\Span(\Lat(\BMat))$ to be the set of \emph{all} (not only integer) linear combinations of $(\bvec_1, \ldots, \bvec_n)$.
+
+The \emph{Gram-Schmidt orthogonalization} (GSO) ${\wBMat} = (\wbvec_1, \ldots, \wbvec_k)$ is obtained iteratively by setting  $\smash{\wbvec_1 = \bvec_1}$, and $\smash{\wbvec_i}$ as the orthogonal projection of $\bvec_i$ on
+$\smash{{(\bvec_1, \ldots, \bvec_{i-1})}^{\perp}}$ for $i=2, \ldots, k$. 
+This orthogonalization process can be described via matrix-decomposition $\BMat =
+\wBMat\mu\transpose$, where $\mu$ is a lower-triangular matrix with $\mu_{i,j} =
+\langle \bvec_i, \wbvec_j \rangle / \|\wbvec_j \|^2$ for $i \geq j$.
+
+The \emph{minimum distance} (or the \emph{first successive minimum}) of lattice $\Lat$ is the length of its shortest non-zero vector: $\lambda_1(\Lat) = \min_{\vvec \in \Lat \setminus \{\zerovec \}} \vvec$.  Minkowski's inequality states that $\lambda_1 \leq \sqrt{n} \cdot (\det \Lat)^{1/n}$. It is tight up to a constant and we usually treat it as equality to approximate the length of the shortest vector.
+The \emph{$i\th$ successive minima} $\lambda_i(\Lat)$ is the smallest $r$ s.t.\ $\Ball(\zerovec, r)$ contains $\geq i$ linearly independent vectors of $\Lat$. $\lambda_i$'s are independent of the choice of basis.
+
+In Chap.~\ref{chap:LWEasBDD} and Sect.~\ref{sec:ApproxQary}, we deal with the so-called $q$-ary lattices:
+\[
+	\qLat (\BMat) = \Bigl\{\yvec \in \Z^n \colon \yvec = \sum_{i=1}^n z_i \cdot \bvec_i = \BMat \zvec \mod q \colon z_i \in \Z \Bigr\}.
+\]
+Such a lattice forms an image of $\BMat$, $\Image(\BMat)$. Later, we shall be dealing with a $q$-ary lattice $\qLat \subset \Z^m$ formed by $\BMat \in \Z_q^{m \times n}$ for $m > n$. This is a lattice of rank $m$: the first $n$ basis-vectors are columns of $\BMat$ and the remaining $m-n$ vectors are the $q$-vectors of the form $(0, \ldots, q, \ldots, 0)$.
+
+The kernel of $\BMat$ forms another (the so-called scaled \emph{dual} to $\qLat (\BMat)$) $q$-ary lattice: 
+\[
+	\qLATTp (\BMat) = \{ \xvec \in \Z^n \colon \BMat \xvec = 0 \mod q \}.
+\] 
+In general, the \emph{dual} of $\Lat$ is defined as $\Lat^* = \{ \yvec \in \Span(\Lat) \colon \ScProd{\xvec}{\yvec} \in \Z \quad \forall \xvec \in \Lat \}$.
+
+\paragraph{Hard problems on lattices.} There are several fundamental problems related to lattices. The most cryptographically relevant are the following five. 
+
+The \emph{Closest Vector Problem} (\CVP) asks to find a lattice point $\vvec \in \Lat$ closest to a given (target) point $\tvec \in \R^n$. We write $(\Lat(\BMat), \tvec)$ for a $\CVP$ instance on the lattice $\Lat(\BMat)$.
+
+In the promise variant of \CVP, the \emph{Bounded Distance Decoding} (\BDD) problem, we know in addition that $\| \tvec - \vvec \| < R$ where $R \ll \lambda_1(\Lat)$. In this case, the solution $\vvec$ is unique.
+
+In the \emph{Shortest Vector Problem} (\SVP), we are asked to find $\vvec \in \Lat$ s.t.\ $\| \vvec \| = \lambda_1 (\Lat)$. 
+
+We can relax the above and ask for a vector $\vvec$ s.t.\ $\| \vvec \| \leq \gamma \lambda_1 (\Lat)$. This problem is called the approximate Shortest Vector Problem ($\appSVP$). In general, the approximation factor $\gamma$ can be a function of $n$. In Chap.~\ref{chap:kList} we present an algorithm that solves $\appSVP$ for constant $\gamma$.
+
+A promise variant of $\SVP$ is a so-called \emph{unique} \SVP problem: we are promised that the first successive minimum $\lambda_1$ is $\gamma$ times shorter than the second minimum $\lambda_2$. The quantity $\tfrac{\lambda_2}{\lambda_1} = \gamma$ is know as the lattice \emph{gap}. We write $\uSVP$ for short. For both $\appSVP$ and $\uSVP$, the larger $\gamma$ is, the easier the problem. We refer to \cite{C:LyuMic09} for reductions between the $\BDD$, $\uSVP$, and $\appSVP$ problems.   
+
+\paragraph{Lattice basis reduction} is an algorithm that on a lattice basis as input returns another basis for this lattice that consists of shorter and more mutually orthogonal vectors (mutual orthogonality translates into the slow decay of the length of the Gram-Schmidt vectors). There are several notions of reducedness of a basis ranging from fast but weak (in terms of quality of the output) \LLL reduction due to A.\ Lenstra, H.\ Lenstra, and L.\ Lov{\' a}sz \cite{LLL82} to strong but computationally inefficient Hermite-Korkine-Zolotarev reduction. The basis reduction we are mostly interested in is called the \BKZ reduction (short for Block-Korkine-Zolotarev, \cite{TCS:Sch87}). Together with a lattice-basis, it receives as input parameter $\beta$ that determines the length of the output basis-vectors. The larger $\beta$ is, the shorter the  output basis-vectors will be. More formally, \BKZ run on an $n$-dimensional lattice $\Lat$, produces a basis with the first (i.e.\ the shortest) vector satisfying
+\begin{equation} \label{eq:b1norm_ineq}
+	\smash{
+	\| \bvec_1 \| \leq 2 \beta^{\tfrac{n}{2 \beta}} \cdot (\det \Lat)^{\tfrac{1}{n}}.
+	}
+\end{equation}  
+\BKZ works by calling an \SVP-solver on a sub-lattice of dimension $\beta$. 
+In \cite{C:HanPujSte11} it was shown that after $\poly(n)$ number of \SVP-calls, the guarantee defined in Eq.~(\ref{eq:b1norm_ineq}) is achieved. 
+Hence, if the running time of an \SVP algorithm for dimension $\beta$ is $T_{\SVP}(\beta)$, the running time of \BKZ is $T_{\BKZ}(\beta) = \poly(n) \cdot T_{\SVP}(\beta)$. 
+Currently, the best algorithms for \SVP are at least exponential in the dimension: the algorithm due to \cite{STOC:ADRS15} \emph{provably} solves \SVP in $2^{n + o(n)}$ time, while \emph{heuristically} we have a slightly better constant in the exponent due to \cite{SODA:BDGL16}, namely $2^{0.292n + o(n)}$.
+All these single-exponential algorithms require $2^{\bigO(n)}$ memory. 
+In the memory-efficient \SVP-solver of Kannan \cite{STOC:Kannan83}, the running time increases to $2^{\bigO(n \log n)}$ with only $\poly(n)$ space complexity.  
+
+As already mentioned above, a weaker form of lattice basis reduction that runs in polynomial time, is realized by the \LLL algorithm, where we have the guarantee that the shortest returned vector satisfies $\| \bvec_1 \| \leq \gamma^{\frac{n-1}{2}} (\det \Lat)^{1/n}$ for $\gamma > 4/3$. 
+   
+\paragraph{Geometric Series Assumption (GSA)} proposed by Schnorr in \cite{Sch03}, gives an estimate on the relative length of the Gram-Schmidt vectors $\wbvec$ of a basis output by $\beta$-\BKZ. The assumption says that the sequence $\| \wbvec_i \|$ decays geometrically in $i$, namely $\frac{\| \wbvec_i \| }{\| \wbvec_{i+1} \|} \approx \beta^{1 / \beta}$. It is equivalent to
+\begin{equation} \label{eq:GSA}
+	\smash{
+	\| \wbvec_i \| \approx \| \bvec_1 \| \cdot \beta^{-\tfrac{i}{\beta}}.
+	}	
+\end{equation}
+We treat the above Eq.~(\ref{eq:GSA}) as equality. From the fact that the product of all Gram-Schmidt vectors is equal to the lattice determinant, combining Eq.~(\ref{eq:b1norm_ineq}) and Eq.~(\ref{eq:GSA}) yields 
+\begin{equation} \label{eq:b1norm}
+	\smash{
+	\| \bvec_1 \| = (\beta)^{\tfrac{n}{2 \beta}} \cdot (\det \Lat)^{\tfrac{1}{n}}.
+	}
+\end{equation}
+
+\paragraph{Discrete Gaussian distribution.} For a vector $\vvec$ and any $s > 0$, define $\varrho_s(\vvec) = \exp(-\pi \| \vvec \|^2 / s^2)$ as a Gaussian function with \emph{parameter} (or \emph{width}) $s$. To turn this function into a probability density function over a (countable) set $\mathcal{A} \subset \R^n$, define the normalization factor as $\varrho_s(\mathcal{A}) = \sum_{\vvec \in \mathcal{A}} \varrho_s(\vvec)$. When $\mathcal{A}$ is taken as a lattice $\Lat$, the \emph{discrete Gaussian probability distribution}  with parameter $s$ over $\Lat$ is defined with the probability density function
+\begin{equation} \label{eq:DiscGauss}
+	D_{\Lat, s}(\vvec) = \frac{\varrho_s(\vvec)}{\varrho_s(\Lat)} = \frac{\exp(-\pi \| \vvec \|^2 / s^2)}{\sum_{\vvec \in \Lat} \varrho_s(\vvec)}.
+\end{equation}
+The parameter $s$ is the scaled standard deviation: for $s \rightarrow \infty$, the standard deviation is $s/\sqrt{2 \pi} + \smallo(s)$. A way to sample a discrete Gaussian for a given lattice can be found in \cite{STOC:GenPeiVai08}. We will be mainly concerned with the discrete Gaussian defined over the lattice $\Z_q^n$. 
+
+It is known that for integer lattices  $\Lat$ (i.e.\  $\Lat \subset \Z^n$), a sufficiently wide discrete Gaussian distribution `blurs' the discrete structure of $\Lat$, such that the distribution becomes very close to a continuous Gaussian \cite{RSA:LinPei11}, \cite{EC:MicPei12}. Hence, for large enough $s$, we can approximate a discrete Gaussian by a continuous one. We make use of the tail-bounds for the Gaussian distribution. For fixed $s >0$ and $y \rightarrow \infty$:
+
+\begin{equation}\label{eq:TailBound}
+1-\frac{1}{s} \int\limits_{-y}^{y}\exp \Bigl(-\frac{\pi x^2}{s^2} \Bigr)\mathrm{d}x = e^{-\TLandau\bigl(\tfrac{y^2}{s^2}\bigr)}
+\qquad
+1-\frac{\sum\limits_{x=-y}^{y}\exp(-\frac{\pi x^2}{s^2})}{\sum\limits_{x=-\infty}^\infty \exp(-\frac{\pi x^2}{s^2})} = e^{-\TLandau\bigl(\frac{y^2}{s^2}\bigr)}
+\end{equation} 
+
+\section{Learning with Errors}   \label{sec:PrelinLWE}
+The Learning with Errors problem (\LWE) was introduced by Regev in \cite{STOC:Regev05}. The \LWE problem is parametrized by an integer $n$, modulus $q = q(n)$ (not necessarily prime) and an error distribution $\chi_{\alpha}:~\Z_q \rightarrow \R^+$ with $\alpha <1$. $\alpha$ is known as the `error-rate'. Usually $\chi_{\alpha}$ is taken as a discrete Gaussian distribution over $\Z_q$ of width $s= \alpha q$. 
+\begin{definition}[\LWE distribution] \label{def:LWE}
+For an integer $q = q(n)$, an error distribution $\chi_{\alpha}$, and a \emph{secret} $\svec \in \Z_q^n$, the \LWE distribution $\LWEDist$ over $\Z_q^n \times \Z_q$ is defined by (1) choosing $\avec \in \Z_q^n$ uniformly at random, (2) sampling $e \leftarrow \chi_{\alpha}$, and outputting a pair $(\avec, \ScProd{\avec}{\svec} + e \bmod q) \in \Z_q^n \times \Z_q$. We call this pair an \LWE-sample.
+\end{definition}
+
+Note that $\svec$ and $\chi$ are fixed for $\LWEDist$. We use $m$ to denote the number of $\LWE$-samples. There are two problems related to the \LWE distribution:
+
+\begin{definition}[Search-\LWE] \label{def:searchLWE}
+	An algorithm solves the \emph{search-\LWE} problem if given $m$ independent \LWE samples from $\LWEDist$ $(\avec_i, \ScProd{\avec}{\svec}+e_i) \in \Z_q^n \times \Z_q$, for $1 \leq i \leq m$, it outputs $\svec$ with high probability. 
+\end{definition}
+
+\begin{definition}[Decisional-\LWE] \label{def:decLWE}
+	An algorithm solves the \emph{decisional-\LWE} problem if given $m$ independent samples from $\Z_q^n \times \Z_q$, it distinguishes with a non-negligible advantage whether these samples were chosen from $\LWEDist$ or from a uniform distribution over $\Z_q^n \times \Z_q$.
+\end{definition}
+
+There is a Search-to-Decision reduction \cite{C:MicMol11, STOC:Regev05} running is $\poly(q)$ time that shows that the above problems are equivalent. The reduction remains efficient for an exponential composite $q$ with $\poly(n)$-bounded divisors \cite{EC:MicPei12}.  
+
+The number of \LWE-samples $m$ is set large enough so that the secret $\svec$ is uniquely defined with high probability. Further, instead of asking for $\svec$, we can ask for the error-vector $\evec$, as one uniquely determines the other.
+
+In \cite{STOC:Regev05}, Regev shows that the \LWE problem is at least as hard as certain worst-case lattice-problems on a lattice of dimension $n$. The reduction is quantum: during the proof, an \LWE oracle is used to create a \emph{reversible} transformation that is applied to a quantum state. A de-quantized version of the reduction was first shown by Peikert in \cite{STOC:Peikert09} for $q$ exponential in $n$ and later improved by Brakerski et al.\ in \cite{STOC:BLPRS13} for any modulus. This result shows a reduction from \appSVP on $\sqrt{n}$-dimensional lattice to $n$-dimensional \LWE. Removing this square-root loss in the classical reduction remains a major open problem in the complexity of \LWE. Both classical and quantum reductions require $\alpha q > \sqrt{2}n$. 
+
+The main hardness parameter of \LWE is the dimension $n$ and the modulus $q$.\footnote{Indeed, Brakerski et al.\ in \cite{STOC:BLPRS13} show that $\LWE$ preserves its hardness as soon as the quantity $n \log q$ remains the same. In other words, $\LWE$ with parameters $(n,q,\alpha)$ is equivalent to \LWE with parameters $(1, n^q, \beta)$ where $\beta$ is not significantly larger than $\alpha$.} The noise-rate $\alpha$ does not affect asymptotical hardness of \LWE as long as it is of order $1/\poly(n)$, i.e. $\alpha q = n^{\gamma}$ for some small constant $\gamma>0$. But when $q=2^{\poly(n)}$ and $\alpha=2^{-n^a}$ for some $a \in (0,1)$, \LWE can be solved in sub-exponential time $2^{\softO(n^{1-a})}$. In this work, we consider the most popular choices of $q$ and $\alpha$: $q = \poly(n)$, where the degree of the polynomial is a small constant, and $\alpha = \smallo(1)$ (more specifically, in \cite{STOC:Regev05}, the parameters considered are $q = n^2, \alpha = 1/n$ or $\alpha = 1/(\sqrt{n} \log n)$). The number of samples, $m$ does not affect the complexity of the problem and can be chosen arbitrarily large. 
+
+For our asymptotical analysis of \LWE, we relate the parameters as
+\begin{align}
+	\Aboxed{\vspace{15pt} q = n^{\cq} \quad \text{ and } \quad \alpha = \frac{1}{n^{\ca}}, }
+\end{align}
+where $\cq, \ca >0$ are constants and $\cq > \ca$. 
+
+\paragraph{\LWE as a \BDD instance.} Having $m$ \LWE samples, we compose (column-wise) a matrix $\AMat \in \Z_q^{n \times m}$ out of the first components $\avec_i$ and a vector $\tvec$ out of the second components $\ScProd{\avec}{\svec}+e_i$. We obtain an \LWE instance in a matrix form:
+\begin{align*} \label{eq:LWEMatrixForm}
+	(\AMat, \tvec\transpose = \svec\transpose \AMat + \evec\transpose \mod q) \in \Z_q^{n \times m} \times \Z_q^m,
+\end{align*}
+where $\evec \rightarrow \chi_{\alpha}^m$. If $\chi_{\alpha}$ is Gaussian with parameter $\alpha q$, we have $\| \evec \| = \TLandau(\sqrt{m} \alpha q)$ with high probability.
+
+It is easy to see that the search-\LWE problem is an average-case \BDD problem for the $m$-dimensional $q$-ary lattice $\qLat(\AMat\transpose) = \{ \AMat\transpose \xvec \mod q \colon \xvec \in \Z_q^n \}$. A basis for this lattice over $\Z^m$ is given by the columns of the matrix:
+\begin{equation} \label{eq:LWEBasis}
+	\BMat = \begin{pmatrix}
+		\Id_{n} & 0 \\
+		 \AMat' & q\Id_{m-n}
+	\end{pmatrix},
+\end{equation}
+where $\smash[t]{\begin{pmatrix}  \Id_{n} \\ \AMat' \end{pmatrix}}$ is a column-reduced echelon form of $\AMat\transpose$ (see Chap.\@ 2.3 in \cite{Cohen95}). 
+
+Assuming $\AMat$ is full-rank (which is the case with high probability), it easily follows that the determinant of $\qLat(\AMat\transpose)$ is $\det(\Lat(\BMat)) = q^{m-n}$. Further, from Minkowski's inequality, we approximate the length of the shortest vector in this lattice as $\lambda_1 (\Lat(\BMat)) \approx \sqrt{m} q^{1-n/m}$.
+Then the \LWE problem is a \BDD instance given by $(\Lat(\BMat), \tvec)$ with a promise that $\| \tvec - \AMat\transpose \svec \bmod q\| = \| \evec \|$. For typical choices of $\alpha$ and $q$, the length of this error-vector, $\Theta(\sqrt{m} \alpha q)$, is much smaller than $\lambda_1(\Lat(\BMat))$. 

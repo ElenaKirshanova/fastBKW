@@ -1,0 +1,72 @@
+\subsection{Parallel implementation} \label{sec:MultiThread}
+
+In Alg.~\ref{alg:GenPrunDepth}, sub-tree traversals for two different nodes on the same level are
+independent, so we can parallelize the algorithm. Let $\nT$ be the number of
+threads (processors) at our disposal. Our goal is to determine the upper-most level $k$ that has
+at least as many nodes $\nNodes(k)$ as $\nT$. Then we can traverse the $\nNodes(k)$
+sub-trees in parallel by calling Alg.~\ref{alg:GenPrunDepth} on each thread.
+
+We start traversing the enumeration tree in a \emph{breadth-first} manner using a queue.
+In a breadth-first traversal, once all the nodes of level $k$ are visited, the queue
+contains all their children (i.e.\ all the nodes of level $k+1$), thus their number
+$\nNodes(k+1)$ can be computed from the size of the queue. Once a level $k$ with $\nNodes(k) \geq \const \cdot \nT$ for
+some constant $\const \geq 1$ is found, we stop the breadth-first traversal and start
+Alg.~\ref{alg:GenPrunDepth} for each of the $\nNodes(k)$ sub-trees separately on each thread. The benefit
+of having $\const>1$ is that whenever one of the threads finishes quickly, it can be assigned
+to traverse another sub-tree. This strategy compensates for imbalanced sizes of sub-trees.
+
+This breadth-first traversal is described in Alg.~\ref{alg:Breadth_first}. At the root we
+have $\nNodes(m)=1$. The associated data to each node are the target
+$\tvec^{(m-1)}$, the error-length $e^{(m-1)}$, and the partial solution $\xvec^{(m-1)}$.
+We store them in queues $Q_t, Q_e, Q_x$. Traversing the tree down is realized via
+dequeuing the first element from a queue (line 9) and enqueuing all its children into the
+queue. When Alg.~\ref{alg:Breadth_first} terminates, we spawn a thread that receives as
+input a target $\tvec^{(k)}$ from $Q_t$, an accumulated so far error-length $e^{(k)}
+\in Q_e$, a partial solution $\xvec^{(k-1)} \in  Q_x$, GSO-lengths $(\|\wbvec_{k-1} \|,
+\ldots, \|\wbvec_{1} \|)$, and bounding functions $\B^{(i)}$, $1 \leq i \leq k-1$. Since
+the number of possible threads is usually a small constant (30-40 on the cluster we are using), there is no blow-up in memory
+usage in the breadth-first traversal.
+
+Note that for a family of bounding functions $\B^{(k)}$ that allows to
+compute the number of children per node without actually traversing the tree,
+e.g.\ the Lindner-Peikert bounding strategy, it is easier to find the level where we start
+parallelization. In case of Lindner-Peikert, $\nNodes(k) = \prod_{i=m}^{m-k}
+d_i$ and hence, we simply compute the largest level $k$ where $\nNodes(k) \geq \const \cdot \nT$.
+
+In the implemented algorithm we slightly modify the above breadth-first traversal: before starting threads with $\nT$ elements from the queue, we sort the queues $Q_t, Q_e, Q_x$ w.r.t.\ the elements from $Q_e$ s.t.\ the paths with shorter error-length are scheduled first. This might be implemented via priority queues or changing the container type to list and sorting the resulting list. This might speed-up the enumeration if we additionally abort the tree-traversal once we have a leaf with the error of length $\const \cdot  \sqrt{m}\alpha q$ for some input constant $\const$. With this, we exploit the fact that the correct error-vector is much shorter than any other error-vector considered by the algorithm. 
+
+
+%
+% Breadth-First
+%
+\begin{algorithm}[h]
+\caption{Traverse Breadth-First $(\BMat, \protect \tvec, \B^{(k)}, \const)$}
+\label{alg:Breadth_first}
+\textbf{Input:} $\BMat=(\bvec_1, \ldots, \bvec_m) \in \Z^{m \times m}, \tvec \in \Z^m$, a family of bounding functions $\B^{(k)}$, $\nT \in \Z$, $\const \in \Z$ \\
+\textbf{Output:} An array ${(\tvec^{(k)})}_i$ of size $\nNodes(k)$, where $\nNodes(k) \geq \const \cdot \nT$, an array of associated error-length ${(e^{(k)})}_i$, an array of associated partial solutions ${(\xvec^{(k)})}_i$, $1 \leq i \leq \nNodes(k)$.
+%\vspace{8pt}
+\begin{algorithmic}[1]
+\State{} Initialize queues $Q_t, Q_e, Q_x$
+\State{} $\Enq{Q_t}{\tvec}$, $\Enq{Q_e}{0}$, $\Enq{Q_x}{\zerovec}$
+\State{} Let $\widetilde{\BMat}\gets\GSO(\BMat)$
+%\If {$m=0$} \Return $(Q_t, Q_e)$
+%\EndIf
+\State{} $\nNodes(m) \gets 1$
+\State{} $k \gets m-1$
+\While{($\nNodes(k+1) < \const \cdot \nT$)}
+    \State{} $\nNodes(k) \gets 0$
+    \For{$j=1 \ldots \nNodes(k+1)$}
+        \State{} $\tvec \gets \Deq{Q_t}$, $e \gets \Deq{Q_e}$, $\xvec \gets \Deq{Q_x}$
+        \State{} $\nNodes(k) \gets \nNodes(k)+ \lceil \sqrt{ B^{(m)}(e) } / \| \wbvec_m \| \rceil $
+        \State{} $c^{*} \gets \langle \tvec, \wbvec_m  \rangle / \|\wbvec_{m}\|^2$
+        \For{$i=0 \ldots \lceil \sqrt{ \B^{(m)}(e) } / \| \wbvec_m \| \rceil  - 1$}
+            \State{} $\Enq{Q_t}{\tvec - \lceil c^{*} \pm  i \rfloor \bvec_k}$
+            \State{} $\Enq{Q_e}{e+{(c^{*} - \lceil c^{*} \pm  i \rfloor)}^2 \|\wbvec_{k}\|^2}$
+            \State{} $\Enq{Q_x}{\xvec + \lceil c^{*} \pm  i \rfloor \bvec_k}$
+        \EndFor{}
+    \EndFor{}
+    \State{} $k \gets k-1$
+\EndWhile{}
+\State{} \Return{} $(Q_t, Q_e, Q_s)$
+\end{algorithmic}
+\end{algorithm}

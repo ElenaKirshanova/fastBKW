@@ -1,0 +1,89 @@
+\subsection{Approximate Shortest Vector Problem} \label{subsec:ApproxSVP}
+
+In this section we expound the connection between the approximate $k$-List problem in Euclidean norm (Def.~\ref{def:kListL2}) and the approximate Shortest Vector Problem, $\appSVP$, for a constant approximation factor $\gamma$. Recall the definition of the latter problem.
+
+On input, we are given a full-rank lattice $\mathcal{L}(B)$ described by a matrix $B \in \R^{n \times n}$ (with polynomially-sized entries) and some constant $\gamma > 1$. The task is to output a non-zero lattice vector $\xvec \in \mathcal{L}(B)$ s.t.\ $ \| \xvec \| \leq \gamma \lambda_1 (B)$. $\xvec$ is a solution to the approximate shortest vector problem. Since the solution is not unique, we are fine with any vector that satisfies the length condition.
+
+The family of so-called sieving (or \AKS) algorithms, described in the pioneering work of Ajtai, Kumar, and Sivakumar \cite{STOC:AjtKumSiv01}, offers the best known to-date heuristic algorithm for $\appSVP$. The fact that this algorithm achieves a single-exponential running time and memory complexity was already stated in the original paper \cite{STOC:AjtKumSiv01}, but a more precise analysis of the constant in the exponent has a long history. The result of Nguyen and Vidick in \cite{NguVid08}, stating the running time of order $2^{5.9n + \smallo(n)}$,  was later improved by Pujol and Stehl\'e to $2^{2.465n + \smallo(n)}$ running time and $2^{1.42n + \smallo(n)}$ space \cite{PujSte09}. Under an assumption on the distribution of lattice-vectors under sieving, we are able to \emph{heuristically} solve $\appSVP$ in $2^{0.415n + \smallo(n)}$ time and $2^{0.208n + \smallo(n)}$ space. Finally, the currently best known running time of  $2^{0.292n + \smallo(n)}$ in \cite{SODA:BDGL16} comes from a line of works based on the techniques from Locality-Sensitive Hashing. This is to be compared with the fastest \emph{provable} $\appSVP$ solver by Aggarwal et al.\ \cite{STOC:ADRS15}. Based on the so-called discrete Gaussian sampling, this algorithm achieves $2^{n + \smallo(n)}$-time and space complexity. 
+
+Practically, however, sieving algorithms are less attractive than Kannan's enumeration with running time of order $2^{\bigO(n \log n)}$. This fact is attributed to exponential memory requirement of sieving (and also to the advances in pruning techniques for enumeration). Recently, Bai, Laarhoven, Stehl\'e aiming at reducing memory, presented a variant of sieving algorithm with space complexity of $2^{0.1887n+\smallo(n)}$ -- an exponential improvement over the previous $2^{0.208n + \smallo(n)}$-space sieving algorithm. Yet the gain comes at cost of increased running time: $2^{0.4812n + \smallo(n)}$ as opposed to $2^{0.415n +\smallo(n)}$ (for non-LSH sieving). To understand the BLS algorithm and how our improved $k$-List solver gives a faster sieving algorithm, we briefly explain how the \AKS algorithm works. 
+
+\paragraph{The Nguyen-Vidick sieve.} Sieving algorithms have two flavours: the Nguyen-Vidick sieve \cite{NguVid08} and the Gauss sieve \cite{STOC:MicVou10}. Both make $\poly(n)$ number of calls to the approximate $2$-List solver. The Nguyen-Vidick sieve starts by sampling lattice-vectors $\xvec \in \Lat(B) \cap \Ball(\zerovec, 2^{\bigO(n)} \cdot \lambda_1(B))$. This can be done using, for example, Klein's sampling procedure \cite{SODA:Klein00} that outputs a lattice-vector of length not greater than $2^{\bigO(n)} \cdot \lambda_1(B)$.  In the $2$-List Nguyen-Vidick sieve, we sample many such lattice-vectors, put them in a list $L$, and search for \emph{pairs} $\xvec_1 \times \xvec_2 \in L \times L$ s.t. $\| \xvec_1 \pm \xvec_2 \| \leq (1-\eps) \max\{\| \xvec_1 \|, \| \xvec_2 \|\}$ for some small $\eps>0$. The sum is put into $\Lout$. The size of $L$ is chosen in a way to guarantee $\normalabs{L} \approx \normalabs{\Lout}$. The search for pairs is repeated over the list $\Lout$ once it is large enough. 
+
+The size of $L$ determines the space complexity of the algorithm. A natural way to shorten the size of the input list $L$ is, instead of looking for pairs, look for triples, or, more general, $k$-tuples that form a short sum. Indeed, it easily follows from Cor.~\ref{cor:BalancedListSizes} that the larger $k$ is, the fewer vectors we should sample for the starting list  $L$ in order to expect $\normalabs{\Lout} = \normalabs{L}$. 
+
+So the Nguyen-Vidick can be generalized to the search for $k$-tuples $\xvec_1, \ldots, \xvec_k \in L \times \ldots \times L$ s.t.\ $\| \xvec_1 + \ldots + \xvec_k \| \leq (1-\eps) \max_{1 \leq i \leq k} \{\| \xvec_i\|\}$. Now the sum $\xvec_1 + \ldots + \xvec_k$ is put into $\Lout$ and the search for $k$-tuples is repeated over $\Lout$. Note that since with each new iteration we obtain vectors that are shorter by a constant factor $(1-\eps)$, starting with $2^{\bigO(n)}$ approximation to the shortest vector (a property guaranteed by Klein's sampler applied to an \LLL-reduced basis), we need only $\poly(n)$ iterations to find the desired $\xvec \in \Lat(B)$.
+
+Naturally, we can apply our Alg.~\ref{alg:AlgConfig} to $k$ copies of the list $L$ to implement the search for short sums. We do so by making a commonly used assumption: we assume the sampled lattice-vectors we put into the list lie uniformly on a spherical shell (on a very thin shell, essentially a sphere). The heuristic here is that it does not affect the behaviour of the algorithm. Intuitively, the discreteness of a lattice should not be `visible' to the algorithm (at least not in the search for the approximate shortest vector; as soon as we see the discreteness, the vectors are already short enough). We refer to \cite{NguVid08} for a more exhaustive discussion on this heuristic. 
+
+The advantage in using our Alg.~\ref{alg:AlgConfig} instead of the BLS $k$-List search within an \appSVP algorithm is straightforward: the search for a `good' $k$-tuple is the routine that determines the complexity of the algorithm. So any improved algorithm for the approximate $k$-List problem immediately leads to a better \appSVP algorithm. 
+
+\paragraph{Gauss sieve.} More interestingly, our improved $k$-List algorithm for $k \geq 3$ can as well be used within the Gauss sieve, which is known to perform faster in practice than the Nguyen-Vidick sieve. Let us briefly recall the Gauss sieve algorithm.
+
+An iteration of the original 2-Gauss sieve as described in \cite{STOC:MicVou10}, searches for pairs $(\pvec, \vvec)$ s.t.\ $\| \pvec + \vvec \| < \max \{\| \pvec \|, \| \vvec \| \}$, where $\pvec \in \mathcal{L}(B)$ is \emph{fixed}, $\vvec \in L \subset \mathcal{L}(B)$, and $\pvec \neq \vvec$. Once such a pair is found and $\| \pvec \| > \| \vvec \|$, we reduce $\pvec$ by setting $\pvec'  \leftarrow \pvec + \vvec$ and proceed with the search over $(\pvec', \vvec)$, otherwise if $\| \pvec \| < \| \vvec \|$, we delete $\vvec \in L$ and store the sum $ \pvec + \vvec$ as $\pvec$-input point for the next iteration. Once no pair is found, we add $\pvec'$ to $L$. On the next iteration, the search is repeated with another $\pvec$ which is obtained either by reducing some previously deleted $\vvec \in L$, or by sampling from $\mathcal{L}(B)$. The idea is to keep only those vectors in $L$ that \emph{cannot} form a pair with a shorter sum. Bai, Laarhoven, and Stehl\'{e}  in \cite{BLS16}, generalize it to the $k$-Gauss sieve by keeping only those vectors in $L$ that do not form a shorter $k$-sum. In the language of configuration search, we look for configurations $(\pvec, \vvec_1, \ldots, \vvec_{k-1}) \in \pvec \times L \times \ldots \times L$ where the first point is fixed, so we apply our Alg.~\ref{alg:AlgConfig} on $k-1$ (identical) lists.
+
+Pseudo-code for $3$-Gauss sieve is given in Alg.~\ref{alg:3GaussSieve} below. We assume the approximation $\gamma \lambda_1(B)$ is given as input. The main procedure (first lines 1-11) is exactly the same as in the original algorithm of Micciancio-Voulgaris. The difference is in the main subroutine $\Call{TripleReduce}$ that implements the approximate $3$-List search with the first vector in a triple being $\pvec$. The list $L$ is always kept sorted so that at the end of the procedure the shortest vector in the list is $L[1]$.
+The algorithm can be easily generalized to the larger $k$, but we decided to present $k=3$ case as the most practically relevant. The experimental results on $3$-Gauss sieve are given in the next section.
+
+\begin{algorithm}[t]
+\caption{$3$-Gauss sieve}
+\label{alg:3GaussSieve}
+\textbf{Input:} $B \in \R^{n \times n}$ - an \LLL-reduced lattice basis, $\gamma \lambda_1(B)$ - the desired approximation factor, $\eps>0$ \\
+\textbf{Output:} $\xvec \in \Lat(B)$ s.t.\ $\| \xvec \| \leq \gamma \lambda_1 (B)$
+
+\begin{algorithmic}[1]
+	\State $L \gets \{\}$ \Comment Sorted list of triple-reduced vectors
+	\State $S \gets \{\}$ \Comment Stack of vectors
+	\While{($L[1] > \gamma \lambda_1(B)$)}
+		\If{$S$ is not empty}
+			\State $\pvec \gets S.\text{pop()}$
+		\Else
+			\State $\pvec \gets \text{KleinSample}(B)$ \Comment Sample a vector from $\Lat(B)$
+		\EndIf
+		\State $\pvec' \gets $ \Call{TripleReduce}{$\protect \pvec, L, s$}
+		\If{$\pvec' \neq \zerovec$}
+			\State $L \gets L \union \{ \pvec'\}$
+		\EndIf
+	\EndWhile
+	\State \Return $L[1]$
+\end{algorithmic}
+
+\vspace{10pt}
+
+\begin{algorithmic}[1]
+	\Function{TripleReduce}{$\protect \pvec, L, S$}
+		\While{($\pvec$ cannot be reduced)} \Comment Try to reduced $\pvec$ first
+			\State $L' \gets $ \Call{Filter}{$ \protect \pvec, L, \eps$}
+			\ForAll{$\vvec_1, \vvec_2 \in L' \times L'$}
+				\If{$\| \pvec \pm \vvec_1 \pm \vvec_2 \| < \| \pvec \|$}
+					\State $\pvec \gets \vvec_1 \pm \vvec_2$ \Comment the sign should satisfy the If-condition
+				\EndIf
+			\EndFor
+		\EndWhile
+		\State $L' \gets $ \Call{Filter}{$ \protect \pvec, L$} \Comment with a new reduced $\pvec$
+		\ForAll{$\vvec_1, \vvec_2 \in L' \times L'$}
+			\If{$\| \pvec \pm \vvec_1 \pm \vvec_2 \| < \max \{ \| \vvec_1 \|, \| \vvec_2 \| \} $}
+				\State $\max \{ \| \vvec_1 \|, \| \vvec_2 \| \} \gets \pvec \pm \vvec_1 \pm \vvec_2$
+			\EndIf
+		\EndFor
+		\State \Return $\pvec$
+	\EndFunction
+\end{algorithmic}
+
+\vspace{10pt}
+
+\begin{algorithmic}[1]
+	\Function{Filter}{$\protect \pvec, L, \eps$} \Comment Filter w.r.t.\@ balanced configuration $\Cbalt$
+		\State $L' \gets \{ \}$
+		\ForAll{$\vvec \in L$}
+			\If{$\big| \frac{\langle \vvec, \pvec \rangle}{\|\vvec \| \|\pvec \|} \big| \geq \frac{1}{3} - \eps$}
+				\State $L' \gets L' \union \{ \vvec \}$
+			\EndIf
+		\EndFor
+		\State \Return $L'$
+	\EndFunction
+\end{algorithmic}
+
+\end{algorithm}
+
+\clearpage

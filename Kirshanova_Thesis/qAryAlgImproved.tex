@@ -1,0 +1,229 @@
+\subsection{An improved algorithm for $\appSVP$ on a $q$-ary lattice} \label{subsec:qAryAlgImproved}
+
+In this section we present an improved algorithm for $\appSVP$ on a $q$-ary lattice. The improvement is in the constant $\const$. We introduce a new constant $\eps$ in the algorithm and $\const$ will depend on it. Namely, when $0<\eps<1/4$, the algorithm achieves a smaller value for $\const$, and when $\eps=0$, it is Algorithm~\ref{alg:ApproxSVP} from the previous section.
+
+The gain comes from the following two changes. First, we do not only perform bucketing on `new' coordinates on the left part (i.e.\ on coordinates with $\ell_{\infty}$-norm less than $q/2$), but also on already considered coordinates on the right part, i.e.\ on blocks in-between the $n\th$ and the $2n\th$ coordinates. 
+
+Second, and more importantly, we reduce the growth of the block-bounds $R_i$. Recall that in the previous algorithm, we had $R_{i+1} = \sqrt{2}R_i$, where the $\sqrt{2}$ comes from the average $\ell_{\infty}$-norm of the sum of two vectors whose $\ell_{\infty}$-norm is $R_i$. This choice balanced the $\ell_{\infty}$-norm on the block $d_i$ with the $\ell_{\infty}$-norm on all the previous blocks $d_{i-1}, \ldots, d_1$.
+Now, we set $R_{i+1} = 2^{1/2 - \eps}R_i$ for some $\eps>0$. The fact that we set $\eps>0$ is justified by our additional bucketing on the right part which requires another choice of $R_i$'s  to balance the norms between the blocks. When compared with the previous algorithm, the expected length of a vector from $L_i$ when we perform this new bucketing is shorter, and since the final length is fixed to $n^{\cg+\cq/2+1/2}$, we can choose larger (by a constant factor) $k$. From the analysis of the previous algorithm, it follows that any constant improvement for $k$ results in smaller $\const$ (see the proof of Thm.~\ref{thm:appSVP}).
+
+Let us describe the algorithm in more detail. The initial list $L_0$ is created in the same way as in Algorithm~\ref{alg:ApproxSVP}: we sample a vector $\xvec \in \Z_q^{2n}$ with the right-most $n$ coordinates bounded by $R_1$. The remaining $n$ left-most coordinates are divided into $k$ blocks of length $d_i$. Note that we can `mirror' this partition to the right-most $n$ coordinates w.r.t. the `middle' $n\th$ coordinate. Let us denote the bounds of the $i\th$ block of length $d_i$ as $[l_{i},\ldots, l_{i-1}]$ for the left part (i.e. $[l_{i-1},\ldots, l_{i}] \in [1, \ldots, n]$) and $[r_{i-1}, \ldots, r_{i}]$ for the right part (i.e.\ $[r_{i-1}, \ldots, r_{i}]\in [n+1, \ldots, 2n]$, see Fig.~\ref{fig:appSVPAlgImproved}).
+
+\begin{algorithm}[t]
+	\caption{$\appSVP$ on a $q$-ary lattice}
+	\label{alg:ApproxSVPImprived}
+	\textbf{Input:} $D$ -- a basis for the lattice $\qLATTp(A) \subset \Z_q^{2n}$ defined as in Eq.~(\ref{eq:BasisD}), $\gamma = n^{\cg}$ -- the approximation factor, $\cg=\TLandau(1)$ \\
+	\textbf{Output:} $L_k$ -- list of vectors from $\qLATTp(A)$ with vectors of norm $\| \vvec \| \leq n^{\cg+\cq/2+1/2}$;
+	
+	\begin{algorithmic}[1]
+		
+		\State Set the sieving bounds $R_i$ as $R_1 = n^{\smallo(1)}$ and ${\color{blue}R_i = 2^{(1/2-\eps)(i-1)} R_1}$ for $i \geq 2$.
+		\State Set the lengths of blocks $d_i$ as in Eq.~(\ref{eq:d_iImp}) together with the corresponding boundaries of the {\color{blue}left-hand side} blocks $(l_i, \ldots, l_{i-1})$ and of the {\color{blue}right-hand side} blocks $(r_{i-1}, \ldots, r_i)$ s.t.\ $l_{i}-{l_{i-1}} = r_{i-1} -r_i  = d_i$, and $l_k = 2n, l_0 = r_0 = n, r_k = 2n$.
+		
+		\Repeat \Comment{Create the list $L_0$}
+		\State Choose $\xvec \in \Z_q^{2n}$ s.t.\ $\| [\xvec]_{n+1}^{2n} \|_{\infty} \leq R_1$
+		\State $L_0 \gets L_0 \union \{D\xvec \bmod q\} $
+		\Until{$L_0$ is large enough} 
+		
+		\State $T \gets \emptyset$ \Comment{Initialize table $T$ indexed by buckets}
+		\ForAll {$i=1 \ldots k$} 
+		\ForAll { $\vvec \in L_{i-1}$} 
+		\State ${\color{blue} b \gets \Big\lfloor \frac{[\vvec\mkern2mu]_{l_i}^{l_{i-1}} [\vvec\mkern2mu]_{r_{i-1}}^{r_i}}{R_i} \Big\rceil}$ \Comment Find the bucket for $\vvec[l_i, \ldots, l_{i-1}, r_{i-1}, \ldots r_i]$
+		\If{$T[b] = \emptyset$}
+		\State $T[b] \gets \vvec$
+		\Else
+		\State $L_{i} \gets L_{i} \union \{T[b] - \vvec \}$
+		\State $T[b] \gets \emptyset$
+		\EndIf
+		\EndFor
+		\EndFor
+		\State \Return $L_k$
+	\end{algorithmic}
+\end{algorithm}
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[]
+	\tikzset{
+		List/.style={
+			rectangle split, rectangle split horizontal,  
+			draw=black, thick,
+			%text width=10em,
+			inner sep=6pt,
+		} 
+	}    
+	%\draw[gray!30, ->] (34pt,-130pt) -- (34pt,130pt);
+	\matrix (m) [row sep=1em, column sep=3em]{
+		\node[](L0) {$L_0:$}; & 
+		\node[List, rectangle split parts=3, name=list, rectangle split part fill={black!60,black!60,black!10}] (list) {
+			\nodepart[text width=5.4cm]{one}{}
+			\nodepart[text width=0.6cm]{two}
+			\nodepart[text width=6cm] {three}};
+		
+		\draw [decoration={brace, raise=5pt},
+		decorate,below=10pt] (list.two split north) -- (list.north east) node [black,midway, yshift=20pt] {\scriptsize $n$}; 
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list.one split north) -- (list.two split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list.two split south) -- (list.south east) node [black,midway, yshift=-10pt] {\scriptsize $\leq R_1$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list.south west) -- (list.two split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq q/2$};
+		\draw [decoration={brace,raise=18pt},
+		decorate,below=10pt](list.north west) -- (list.north east) node [black,midway,yshift=30pt] {\scriptsize $2n$};\\
+		%---------------------------------------  
+		\node[](L1) {$L_1:$}; & 
+		\node[List, rectangle split parts=6, name=list2, rectangle split part fill={black!60,black!60,black!15,black!15}] (list2) {
+			\nodepart[text width=4.2cm]{one}{}
+			\nodepart[text width=0.8cm]{two}
+			\nodepart[text width=0.6cm] {three}
+			\nodepart[text width=0.6cm] {four}
+			\nodepart[text width=0.8cm] {five}
+			\nodepart[text width=3.7cm] {six}};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list2.five split north) -- (list2.north east) node [black,midway, yshift=20pt] {\scriptsize $n-d_1-d_2$};
+		
+		\draw [decoration={brace,raise=5pt},
+		 decorate,below=10pt](list2.three split north) -- (list2.four split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list2.two split north) -- (list2.three split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list2.two split south) -- (list2.south east) node [black,midway, yshift=-10pt] {\scriptsize $\leq \sqrt{2}R_1$};
+		
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list2.one split north) -- (list2.two split north) node [black,midway, yshift=20pt] {\scriptsize $d_2$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list2.four split north) -- (list2.five split north) node [black,midway, yshift=20pt] {\scriptsize $d_2$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list2.south west) -- (list2.two split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq q/2$};\\ [-1ex]
+		
+		%---------------------------------------  
+		\node[](L2) {$L_2:$}; & 
+		\node[List, rectangle split parts=8, name=list3, rectangle split part fill={black!60,black!60,black!15,black!25,black!25,black!15,black!25}] (list3) {
+			\nodepart[text width=3.0cm]{one}{}
+			\nodepart[text width=0.8cm]{two}
+			\nodepart[text width=0.8cm]{three}
+			\nodepart[text width=0.6cm]{four}
+			\nodepart[text width=0.6cm]{five}
+			\nodepart[text width=0.8cm]{six}
+			\nodepart[text width=0.8cm]{seven}
+			\nodepart[text width=2.5cm]{eight}};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.seven split north) -- (list3.north east) node [black,midway, yshift=20pt] {\scriptsize $n\mkern-3mu-d_1\mkern-3mu-d_2\mkern-3mu-d_3$}; 
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list3.six split south) -- (list3.south east) node [black,midway, yshift=-10pt] {\scriptsize $ \leq 2 R_1$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.six split north) -- (list3.seven split north) node [black,midway, yshift=20pt] {\scriptsize $d_3$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.five split north) -- (list3.six split north) node [black,midway, yshift=20pt] {\scriptsize $d_2$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list3.five split south) -- (list3.six split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq \sqrt{2}R_2$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.four split north) -- (list3.five split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.three split north) -- (list3.four split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list3.three split south) -- (list3.five split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq 2
+		R_1$};		
+		
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.two split north) -- (list3.three split north) node [black,midway, yshift=20pt] {\scriptsize $d_2$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list3.two split south) -- (list3.three split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq \sqrt{2}R_2$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list3.one split north) -- (list3.two split north) node [black,midway, yshift=20pt] {\scriptsize $d_3$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list3.south west) -- (list3.two split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq q/2$};\\ [-3ex]
+		
+		\node[] (vd) {$\vdots$}; &
+		\node[]{$\vdots$}; \\ [-3ex]
+		%---------------------------------------  
+		
+		\node[](Lk) {$L_k:$}; & 
+		\node[List, rectangle split parts=8, name=list4, rectangle split part fill={black!15,black!25,black!35,black!45,black!45,black!35,black!25,black!15}] (list4) {
+			\nodepart[text width=1.0cm]{one}{}
+			\nodepart[text width=2.8cm]{two}{\ldots}
+			\nodepart[text width=0.8cm]{three}
+			\nodepart[text width=0.6cm]{four}
+			\nodepart[text width=0.6cm]{five}
+			\nodepart[text width=0.8cm]{six}
+			\nodepart[text width=2.3cm]{seven}{\ldots}
+			\nodepart[text width=1.0cm]{eight}};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list4.seven split north) -- (list4.north east) node [black,midway, yshift=20pt] {\scriptsize $d_k$}; 
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list4.seven split south) -- (list4.south east) node [black,midway, yshift=-10pt] {\scriptsize $\leq \sqrt{2}R_k$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list4.five split north) -- (list4.six split north) node [black,midway, yshift=20pt] {\scriptsize $d_2$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list4.five split south) -- (list4.six split south) node [black,midway, yshift=-10pt] {\scriptsize $ \leq 2^{\tfrac{k-1}{2}} R_2$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list4.four split north) -- (list4.five split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list4.three split north) -- (list4.four split north) node [black,midway, yshift=20pt] {\scriptsize $d_1$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list4.three split south) -- (list4.five split south) node [black,midway, yshift=-10pt] {\scriptsize $ \leq 2^{\tfrac{k}{2}} R_1$};
+		
+		\draw [decoration={brace,raise=5pt},
+		decorate,below=10pt](list4.two split north) -- (list4.three split north) node [black,midway, yshift=20pt] {\scriptsize $d_2$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list4.two split south) -- (list4.three split south) node [black,midway, yshift=-10pt] {\scriptsize $ \leq 2^{\tfrac{k-1}{2}} R_2$};
+		
+		\draw [decoration={brace, raise=5pt},
+		decorate,below=10pt](list4.north west) -- (list4.one split north) node [black,midway, yshift=20pt] {\scriptsize $d_k$};
+		
+		\draw [decoration={brace, mirror, raise=5pt},
+		decorate,below=10pt](list4.south west) -- (list4.one split south) node [black,midway, yshift=-10pt] {\scriptsize $\leq \sqrt{2} R_k$};
+		
+		
+		
+		
+		
+		%\draw [decoration={brace,raise=5pt},
+		%decorate,below=10pt](list4.four split north) -- (list4.north east) node [black,midway, yshift=20pt] {\scriptsize $l_k$};
+		\\
+	};		
+	%\draw[->, thick] ([yshift=2cm]L0) -- (L1);
+	\draw[transform canvas={scale=0.6, xshift=-140pt, yshift=30pt}, ->, thick] (L0) -- (L1);
+	\draw[transform canvas={scale=0.6, xshift=-140pt, yshift=0pt}, ->, thick] (L1) -- (L2);
+	\end{tikzpicture}
+	\caption[$\appSVP$ on a $q$-ary lattice]{ Pictorial representation of Alg.~\ref{alg:ApproxSVPImprived}. Due to the fact that our bounds satisfy $R_{i+1}<\sqrt{2}R_i$, the $\ell_{\infty}$-norm is not evenly distributed over the length.}
+	\label{fig:appSVPAlgImproved}
+\end{figure}
+
+Now, on step $i$, the two vectors, $\vvec_1$ and $\vvec_2$ from $L_{i-1}$, land in the same bucket if
+\[
+	\Big\lfloor \frac{[\vvec_1]_{l_i}^{l_{i-1}} [\vvec_1]_{r_{i-1}}^{r_i}}{R_i} \Big\rceil =
+	\Big\lfloor \frac{[\vvec_2]_{l_i}^{l_{i-1}} [\vvec_2]_{r_{i-1}}^{r_i}}{R_i} \Big\rceil. 
+\]
+This additional bucketing on the $[r_{i-1}, \ldots, r_{i}]$-coordinates makes the difference $\vvec_1 - \vvec_2 \in L_{i}$ shorter.
+
+The complete algorithm is presented in pseudo-code in Alg.~\ref{alg:ApproxSVPImprived}. Parts where the new algorithm differs from the one given in the previous section are highlighted blue.

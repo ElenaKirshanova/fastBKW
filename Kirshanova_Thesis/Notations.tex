@@ -1,0 +1,37 @@
+%Notations
+\newcommand{\dotrule}[1]{%
+   \parbox[t]{#1}{\dotfill}}
+   
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{c p{1.6cm} l }
+	
+	%\hline
+	
+	$\N, \Z, \Q, \R$ & $\dotfill$ & sets of natural, integer, rational, real numbers \\%[1ex]
+	$ \Z_q = \begin{cases*} 			
+	[-q/2 \ldots q/2), \; q \text{ even}\\
+	[-\frac{q-1}{2} \ldots \frac{q-1}{2}], \; q \text{ odd}
+	\end{cases*} 
+	$ &  $\dotfill$ & ring of integers $\bmod~ q$ \\[2ex]
+	$\Z^n, \Z_q^n, \Q^n, \R^n$ &  $\dotfill$ & vector-spaces of dim.\ $n$ \\
+	$\xvec$ & \dotfill & column vector \\
+	$\xvec\transpose$ & \dotfill & row vector \\
+	$\| \xvec \|$ & \dotfill & Euclidean length of vector $\xvec$ \\
+	$\hspace{8pt} \| \xvec \|_{\infty}$ & \dotfill & $\ell_{\infty}$-norm of $\xvec$: $\max_i \abs{x_i}$ \\
+	$\onevec, \zerovec $ & \dotfill & all-ones, all-zeros vectors \\
+	$\AMat, \BMat$, etc.\ & \dotfill & matrices (composed from vectors column-wise)  \\
+	$\AMat_{i,j}$ & \dotfill & ($i\th$ row, $j\th$ column) element of matrix $\AMat$ \\
+	$\AMat[1\ldots i]$ & \dotfill & the sub-matrix of $\AMat$ formed by first $i$ rows, $i$ columns \\
+	$[\xvec \mkern3mu]_{\ell}^u$ & \dotfill & vector $\xvec$ projected on coordinates $[\ell, \ldots ,u]$ \\
+	$\Image(\AMat)$ &  \dotfill & the image of matrix $\AMat$ \\
+	$\ker(\AMat)$ &  \dotfill & the kernel of matrix $\AMat$ \\
+	$\Id_n$ &  $\dotfill$ & $n \times n$ identity matrix \\
+	$wt(\xvec)$ &  $\dotfill$ & Hamming weight of vector $\xvec \in \ZO{n}$ \\
+	$\Ball(\zerovec, r)$ &  $\dotfill$ & ball of radius $r$ centred at $\zerovec$ \\
+	$\Sphere{n}$ &  $\dotfill$ & $n$-sphere of radius 1, i.e.\ $\Sphere{n} = \{ \xvec \in \R^{n+1} \; | \; \|\xvec \| = 1 \}$ \\
+	$\log x $ &  $\dotfill$ & $\log_2 x$
+\end{tabular}
+\vspace*{20pt}
+
+We use the Landau notations $\bigO(\cdot), \softO(\cdot), \TLandau(\cdot), \WLandau(\cdot), \wLandau(\cdot), \smallo(\cdot)$. We write $\softO_k(\cdot)$ when we want to stress that the asymptotic result holds for fixed $k$. 
+

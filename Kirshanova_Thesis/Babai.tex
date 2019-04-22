@@ -1,0 +1,89 @@
+\subsection{Babai's $\NP$ Algorithm} \label{sec:BabaisNP}
+
+Suppose we are given a lattice-basis $\BMat = (\bvec_1, \ldots, \bvec_m) \in \Z^{m \times m}$ and a target point $\tvec \in \Q^m$.\footnote{While for $\LWE$ the target and the lattice agree in the dimension, this is not required for the algorithm to work. If they do not agree, we project $\tvec$ onto $\Span(\Lat(\BMat))$  and work with the projection as the input target.} 
+We search for a lattice-vector $\vvec \in \Lat(\BMat)$ that is close to $\tvec$.
+Babai's algorithm works as follows. We view the $m$-dimensional lattice $\Lat(\BMat)$ as the $m-1$-dimensional lattice $\Lat(\bvec_1, \ldots, \bvec_{m-1})$ translated via shifts $i \bvec_m$:
+\[
+ \Lat(\BMat) = \bigcup_{i \in \Z} i \bvec_m + \Lat(\bvec_1, \ldots, \bvec_{m-1}).
+\]
+Fixing $i$, we receive a translate $i \bvec_m + \Lat(\bvec_1, \ldots, \bvec_{m-1}) \subset U_i^{(m-1)}$ that is contained in the $m-1$-dimensional hyperplane $U_i^{(m-1)} = \bigl\{\yvec \in \R^m \colon \bigScProd{\yvec}{\frac{\wbvec_m}{\| \wbvec_m \|^2}} = i \bigr\}$ (cf.\ Fig.~\ref{fig:NP1}).
+Babai's algorithm chooses a hyperplane $U_i^{(m-1)}$ that is closest to $\tvec$ (see line \ref{algline:BabaiChoosePlane} in Alg.~\ref{alg:Babai}) with the corresponding translate $\xvec^{(m)} = i \bvec_m$ (line \ref{algline:BabaiChooseTranslate}), and then projects $\tvec = \tvec^{(m)}$ orthogonally onto $U_i^{(m-1)}$ to obtain $\tvec^{(m-1)}$ (line \ref{algline:BabaiProjectTarget}). 
+
+Now we have a new target $\tvec^{(m-1)}$ and a (shifted) sub-lattice $\xvec^{(m)} + \Lat(\bvec_1, \ldots, \bvec_{m-1})$, so we repeat the process by choosing $U_j^{(m-2)} = \smash{ \bigl\{\yvec \in \R^m \colon \bigScProd{\yvec}{\frac{\wbvec_{m-1}}{\| \wbvec_{m-1} \|^2}} = j +  \bigScProd{\xvec^{(m)}}{\frac{\wbvec_{m-1}}{\| \wbvec_{m-1} \|^2}} \text{ and } \bigScProd{\yvec}{\frac{\wbvec_m}{\| \wbvec_m \|^2}} = i \bigr\} }$ closest to $\tvec^{(m-1)}$ (note that $U_j^{(m-2)} \subset U_i^{(m-1)}$). The shifts $\xvec^{(k)}$  accumulate the output vector $\vvec$ coordinate-wise w.r.t.\ the basis $\BMat$ starting from $\bvec_m$. In the algorithm described below, we also keep track of the error incurred by projections. The output error vector $\evec'$ is constructed coordinate-wise w.r.t.\ the Gram-Schmidt basis $\wBMat$ starting from $\wbvec_m$.
+%
+% BABAI's algorithm
+%
+\setlength{\intextsep}{\medskipamount}
+\begin{algorithm}[h]
+\caption{Babai's $\NP$ $(\BMat, \xvec, \protect \tvec)$}
+\label{alg:Babai}
+\textbf{Input:} $\BMat=(\bvec_1, \ldots, \bvec_m) \in \Z^{m \times m}, \xvec \in \Q^m, \tvec \in \xvec+\Span(\BMat), \evec' \in \Q^m$ \hfill \Comment \scriptsize{$\evec'=\xvec=0, k=m$ in the initial call}\\
+\normalsize
+\textbf{Output:} $\vvec\in \Lat(\BMat)$ close to $\tvec$ and $\evec' = \tvec-\vvec$ corresponding error vector
+\begin{algorithmic}[1]
+\State $\xvec^{(k)}\gets \xvec, \tvec^{(k)}\gets \tvec,\evec'^{(k)}\gets\evec'$. 
+\State Let $\wBMat \gets \GSO(\BMat)$. 
+\If {$k=0$} \Return $(\xvec,\evec')$
+\EndIf
+\State Compute $c^{(k)}_1 \gets \bigScProd{\tvec^{(k)}}{\frac{\wbvec_k}{ \vphantom{\scalebox{1.6}x^2} \|\wbvec_k \|^2}}$
+\State Choose $i^{(k)} \in \Z$ s.t.\ $c^{(k)}_2 = \bigScProd{\xvec^{(k)}}{\frac{\wbvec_k}{\|\wbvec_k \|^2}} + i^{(k)}$ closest to $c^{(k)}_1$ \label{algline:BabaiChoosePlane}
+\State $\xvec^{(k-1)}\gets \xvec^{(k)}+i^{(k)}\bvec_k$ \label{algline:BabaiChooseTranslate}
+\Comment $U_i^{(k-1)} = \xvec^{(k-1)}+\Lat(\BMat^{(k-1)})$ is the nearest plane
+\State $\evec'^{(k-1)}\gets \evec'^{(k)} + (c^{(k)}_1-c^{(k)}_2)\wbvec_k$
+\State $\tvec^{(k-1)}=\tvec^{(k)} - (c^{(k)}_1-c^{(k)}_2)\wbvec_k$ \label{algline:BabaiProjectTarget} \Comment Project onto $U_i^{(k-1)}$ 
+\State \Return $\texttt{NearestPlanes} ((\bvec_1,\ldots,\bvec_{k-1}), \xvec^{(k-1)},\tvec^{(k-1)},\evec'^{(k-1)})$
+\end{algorithmic} 
+\end{algorithm}
+
+\paragraph{Analysis.} It is easy to verify that Babai's Algorithm runs in time polynomial in $m$. In the context of \LWE, the algorithm succeeds (i.e.\ the output vector $\evec'$ is the \LWE error $\evec$) if $\evec$ lies in the interior of $\FP(\wBMat)$. In other words, if we write $\evec = \sum_k e_k \frac{\wbvec_k}{ \| \wbvec_k \|}$ w.r.t.\ the normalized Gram-Schmidt basis, we have $\evec = \evec'$ if $\abs{e_k} < \tfrac{1}{2} \|\wbvec_k \|$. If there exist an index $k$ s.t.\ $\abs{e_k} > \tfrac{1}{2} \|\wbvec_k \|$, the algorithm fails. In case, $\abs{e_k} = \tfrac{1}{2} \|\wbvec_k \|$, there will be two equally close translates and we choose one arbitrarily. This case does not affect the asymptotics.
+
+For the analysis, we approximate the discrete Gaussian $\evec$ by a continuous one, i.e., the $e_k$'s are assumed to be independent Gaussians with parameter $\alpha q$. Note that expressing $\evec$ in terms of the normalized Gram-Schmidt basis (instead of the standard $\Z$-basis) does not change the distribution of $e_k$ as the former basis is just a rotation of the later one and the continuous Gaussian distribution is rotation-invariant. 
+
+Recall that Babai's algorithm receives as input a $\beta$-\BKZ reduced basis $\BMat$. Under the Geometric Series Assumption (Eq.~(\ref{eq:GSA})), the sequence $\| \wbvec_1 \|, \ldots, \| \wbvec_m\|$ decays geometrically. Combining this with the guarantee on $\| \bvec_1\|$ (Eq.~(\ref{eq:b1norm})), we can say whether (1) $\| \wbvec_m\|> \alpha q$ (and the success probability of the algorithm is constant), or (2) $\| \wbvec_1 \| = \alpha q$ (the success probability is super-exponentially low). In the intermediate case (relevant for our \LWE setting), $ \| \wbvec_m \| \ll \alpha q \ll \| \wbvec_1 \|$, all the steps $k$ for which $\| \wbvec_k \| \ll \alpha q $ contribute to a super-exponentially small success probability, while the steps starting from $\| \wbvec_j \| \approx \alpha q$ do not change the success probability much. The next lemma formalizes these arguments.
+
+\begin{lemma} \label{lem:BabaiHelpingLemma}
+Let the sequence $\|\wbvec_1 \|, \ldots, \|\wbvec_m \|$ be geometrically decreasing with $\|\wbvec_k \| / \|\wbvec_{k+1} \| = \beta^{1/ \beta} >1$. Let $e_1, \ldots, e_m$ be independent continuous Gaussians with the density function $\varrho(x) = \tfrac{1}{s} \exp(-\frac{\pi x^2}{s^2})$. Denote $p_k := \Pr[ \abs{e_k} < \| \wbvec_k \|]$.
+	\begin{enumerate}
+		\item If $\| \wbvec_m \| > s (\log{m})^{1/2 + \eps}$ for fixed constant $\eps>0$, then $\prod_k p_k = 1 - \smallo(1)$.
+		\item If $\| \wbvec_1 \| = s$, then $\prod_k p_k = 2^{-\bigO(m)} \cdot 2^m \beta^{-\frac{1}{2} \frac{m(m+1)}{\beta}}$.
+	\end{enumerate}
+\end{lemma}  
+
+\begin{proof}
+	To see the first statement, we use the Gaussian tails-bounds Eq.~(\ref{eq:TailBound}). For $\| \bvec_k \| > s (\log{m})^{1/2 + \eps}$, $1-p_k$ is super-polynomially small, namely, $1-p_k = e^{-\TLandau((\log{m})^{1+2\eps})}$. The result follows from the union bound and the fact that $e^{-t} \sim 1-t$ for $t \rightarrow 0$. 
+	
+	For the second statement, informally, we approximate the area under the Bell-shaped curve on the interval $[- \| \wbvec_i \|, \| \wbvec_k \|]$ with a parallelepiped. More precisely,
+	\[
+		p_k = \frac{1}{2 \varrho_s(\Z)}\int\limits_{- \| \wbvec_k \|}^{ \| \wbvec_k \|} \exp \Bigl(-\frac{\pi x^2}{s^2} \Bigr) \d x = \TLandau(1) \frac{2 \| \wbvec_k \|}{s}.
+	\]
+Then 
+	\[
+		\prod_k p_k = 2^{-\bigO(n)} \cdot 2^n \frac{ \prod_k \| \wbvec_k \|}{s^n} = 2^{-\bigO(m)} \cdot 2^n  \frac{\|\wbvec_1\|^m}{s^m} \prod_{i=2}^{m} \beta^{-i/ \beta} = 2^{-\bigO(m)} \cdot 2^m \beta^{-\frac{1}{2} \frac{m(m+1)}{\beta}}. 
+	\]
+\end{proof}
+
+For $\LWE$, we have $s = \alpha q$. Recall that we relate the \LWE parameters $(n, q, \alpha)$ as $q = \bigO(n^{\cq})$, $\alpha~= \bigO(1 / n^{\ca})$ for positive constants $\cq, \ca $, $\cq > \ca$, from where it easily follows that the width $s=\alpha q$ is $ \bigO(n^{\cq-\ca})$. With the above lemma, we show the the success probability of Babai's algorithm depends on whether $\|\wbvec_m \|$ is larger or smaller than $s = \alpha q$. %The number of \LWE samples $m$ is linear in $n$. 
+
+\begin{thm}[Analysis of the $\NP$ Algorithm~\ref{alg:Babai}] \label{thm:PsuccBabai}
+	Given a $\beta = \TLandau(n)$-\BKZ reduced basis that arises from $m = \TLandau(n)$ \LWE-samples with parameters $(n, q=\bigO(n^{\cq}), \alpha = \bigO(1 / n^{\ca}) )$ for positive constants $\cq>\ca$, Babai's $\NP$ Algorithm~\ref{alg:Babai} solves the Search-\LWE problem in time $\poly(m)$ with success probability
+	\begin{equation*}
+\Psucc(\NP)=\begin{cases}
+                  2^{-\frac{1}{2} \bigl(\frac{m}{2\beta}-\ca + \frac{n}{m} \cq  \bigr)^2 (1+\smallo(1)) \cdot \beta\log\beta},			      \quad & \text{if }  \frac{m}{2 \beta} - \ca + \frac{n}{m} \cq  > 0  \\
+                  1-o(1),                                     \quad&\text{if } \frac{m}{2 \beta} - \ca + \frac{n}{m}\cq  < 0,
+                  \end{cases}
+\end{equation*}
+assuming the Geometric Series Assumption holds and the \LWE error follows a continuous Gaussian distribution.
+\end{thm}
+
+\begin{proof}
+	From Eqs.~(\ref{eq:GSA}), (\ref{eq:b1norm}), we have $\| \wbvec_i \| = \beta^{\frac{m}{2 \beta} - \frac{i}{\beta}} \cdot q^{1 - \frac{n}{m}}$. We want to compute a `critical' level $k^*$ s.t.\ $\| \wbvec_{k^*} \| = \alpha q$. It is easy to verify that $k^* = \beta \bigl( \frac{m}{2 \beta} - \frac{n}{m} \cq + \ca \bigr)$, from where it follows
+	\begin{equation} \label{eq:BabaiProof}
+		m - k^* = \beta \Bigl( \frac{m}{2 \beta} + \frac{n}{m} \cq - \ca \Bigr).
+	\end{equation}
+In case $\frac{m}{2 \beta} + \frac{n}{m} \cq - \ca < 0$, we have $m < k^*$ and $\| \wbvec_m \| > \alpha q \cdot \poly(n)$. So all the Gram-Schmidt vectors are large enough to guarantee a super-polynomially small (in $m$) error probability on each level. From Lemma~\ref{lem:BabaiHelpingLemma}, first statement, the success probability of Algorithm~\ref{alg:Babai} is then $1-\smallo(1)$.
+
+In case $\frac{m}{2 \beta} + \frac{n}{m} \cq - \ca > 0$, we use the second statement of Lemma~\ref{lem:BabaiHelpingLemma} having $\| \wbvec_{k^*} \| = \alpha q$ instead of $\| \wbvec_1\|$ and obtain
+	\[
+		\Psucc(\NP) = 2^{-\bigO(m-k^*)} \cdot 2^{m-k^*} \beta^{-\frac{1}{2} \frac{(m-k^*)^2}{\beta}} = 2^{-\frac{1}{2} \bigl(\frac{m}{2\beta}-\ca + \frac{n}{m} \cq  + \smallo(1) \bigr) ^2 \cdot \beta \log\beta}.
+	\]
+\end{proof}

@@ -1,0 +1,22 @@
+\section{Approximate $k$-List in Euclidean norm} \label{sec:Approx_kList_Euclid}
+
+The problem we are going solve in this section is the following special case of the $k$-List problem. This problem is at the heart of sieving algorithms for the Shortest Vector Problem.
+
+
+\begin{definition}[Approximate $k$-List problem in $l_2$-norm] \label{def:kListL2}
+Let $0 < t < \sqrt{k}$. Given $k$ lists $L_1, \ldots, L_k$ of equal exponential size whose elements are iid.\ uniformly chosen vectors from the $n$-sphere $\Sphere{n}$, the task is to output a $1-\smallo(1)$-fraction of $k$-tuples $\xvec_1 \in L_1, \ldots, \xvec_k \in L_k$ s.t.\ $\|\xvec_1 + \ldots + \xvec_k \|^2 \leq t^2$. Such a tuple $(\xvec_1, \ldots, \xvec_k)$ is called a solution to the approximate $k$-List problem. 
+\end{definition}
+
+We analyze the case where $t$ and $k$ are constant and the input lists are of size $2^{\const n}$ for some constant $\const$. The restriction $t < \sqrt{k}$ is set to get a meaningful problem. Due to the fact that for large $n$, random vectors $\xvec_i$'s from $\Sphere{n}$ are almost orthogonal with high probability (cf.\ Thm.~\ref{thm:WishartDist}), a $1-\smallo(1)$-fraction of tuples $(\xvec_1, \ldots, \xvec_k) \in L_1 \times \ldots \times L_k$ satisfy $\| \xvec_1 + \ldots + \xvec_k \|^2 \approx k$. So the problem is non-trivial when either $t< \sqrt{k}$, or $t>\sqrt{k}$. We concentrate on the former. With a simple modification our results apply to the latter case as well. Moreover, our algorithm works for lists of different sizes, but it would unnecessarily complicate the analysis, so we stick to lists of equal size. Additionally, equally-sized lists is a relevant scenario for the \SVP-sieving algorithms.
+
+In the applications to sieving (see Sect.~\ref{subsec:ApproxSVP}), we have $t=1$ and look for solutions with the property $\|\xvec_1 \pm \ldots \pm \xvec_2 \| \leq 1$. Since there are $2^k  = \bigO(1)$ possible choices for signs, we can consider each choice separately increasing the running time of the algorithm by a constant factor. %It leads to few optimizations considered in Sect.~\ref{subsec:KListResults}, but they do not change the asymptotics.
+
+\input{Config}
+
+\input{kListAlgorithm}
+
+\input{kListAnalysis}
+
+\input{ApproxSVP}
+
+\input{kListTable}

@@ -1,0 +1,63 @@
+\subsection{Single threaded implementation} \label{sec:SingleThread}
+
+Here we give an alternative representation of the pruning algorithm $\GenPrun$ (Alg.~\ref{alg:GenPrun}) suitable for efficient implementation.
+Recall that a \BDD enumeration algorithm for \LWE with parameters $(n, \alpha, q)$ receives as input a $\beta$-reduced lattice-basis $\BMat \in \Z_q^{m \times m}$ and a target $\tvec \in \Z_q^m$ with a promise that $\tvec$ is only $\TLandau(\alpha q \sqrt{m})$ away from a vector $\vvec \in \qLat(\BMat)$ we search for. In addition, the algorithm is provided with a description of a bounding function $\B$ which is used to prune the enumeration tree (see examples of $\B$ in Sect.~\ref{sec:GenPrun}).
+
+Algorithm $\GenPrunDepth$ (Alg.~\ref{alg:GenPrunDepth}) is a \emph{depth-first} description of Alg.~\ref{alg:GenPrun} from the previous section. It constructs an enumeration tree where a $k$-level node stores (1) a target vector $\tvec^{(k)}$, (2) a coefficient-vector $\cvec$ of a candidate-solution $\xvec^{(k)} = \sum_{i=k+1}^m \cvec^{(k)}_i \bvec_i$ ($\cvec$ is constructed starting with its $m\th$ coordinate $c_m$ down to $c_1$), and (3) an accumulated \emph{error-length} $e^{(k)} = \sum_{i=k+1}^{m} e'^2_i \|\wbvec_i \|^2$, where $\evec^{(k)} = \sum_{i=k+1}^{m} e'_i \wbvec_i$ is the error accumulated by a node on level $k$. On the root we have $k=m, e^{(m)}=0, t^{(m)} = \tvec$. The leaves ($k=0$) give candidate-solutions $\xvec = \sum_{i=1}^{m} \cvec_i \bvec_i $ with error-length $e^{(0)} =\| \tvec - \xvec \|$. Different paths have different coefficient-vectors $\cvec$. Depth-first traversing is memory-efficient (as opposed to the recursive version given in Alg.~\ref{alg:GenPrun}) since we consider only one path $\cvec$ at a time and decide whether the corresponding error is smaller than the previously found or not. 
+
+Note that instead of keeping the coordinates of a partial error-vector as in Alg.~\ref{alg:GenPrun}, we store only its length. We do so by observing that for bounding functions $\B$ of our interest (like Length Pruning), we only need the error-\emph{length} but not its individual coordinates to evaluate $\B$. So for the algorithm $\GenPrunDepth$ we simplify the definition of a bounding function and consider only functions $\B: \Q_{\geq 0} \rightarrow \Q_{\geq 0}$ that take a squared error-length as input and output the remaining allowed length. From the value $\B(e^{(k)})$, we compute the number of children for a node with the (squared) error-length $e^{(k)}$ (line \ref{algline:GenPrunDNumChildren}), and all the relevant information for its left-most child (lines 11--13). From this left-most child we go down-left again. Once a leaf is reached, we compare its error-length $e^{(0)}$ with the error $\text{minLen}$ of the best (i.e.\ the shortest) solution found so far. In case $e^{(0)}$ is smaller than $\text{minLen}$, a new candidate-solution is constructed from the coefficient vector $\cvec$ of the current path (line \ref{algline:GenPrunDSol}). At the end, the returned solution has the minimal error-length among all the solutions considered by the algorithm. 
+
+%
+% GenPruning Depth-first
+%
+
+\begin{algorithm}[t]
+\caption{$\GenPrunDepth (\BMat, \protect \tvec, \B^{(k)})$}
+\label{alg:GenPrunDepth}
+\textbf{Input:} $\BMat=(\bvec_1, \ldots, \bvec_m) \in \Z^{m \times m}, \tvec \in \Z^m$, a family of bounding functions $\B^{(k)}: \Q \rightarrow \Q$ \\
+\textbf{Output:} $\xvec\in \Lat(\BMat)$ close to $\tvec$ and $e = \|\evec\| = \| \tvec - \vvec \| $
+%\vspace{8pt}
+\begin{algorithmic}[1]
+\State $\tvec^{(m)}\gets \tvec, e^{(m)} \gets 0, k \gets m $.
+\State Let $\widetilde{\BMat}\gets\GSO(\BMat)$
+\If {$m=0$} \Return $(\tvec^{(m)}, e)$
+\EndIf
+\State $(\tvec^{(0)}, \text{minLen}) \gets \NP (\BMat, \tvec)$
+\While{(true)}
+	\If{$(k>0)$}
+		\State $Int \gets \sqrt{ \B^{(k)}(e^{(k)}) } / \| \wbvec_k \|$  \Comment Number of children \label{algline:GenPrunDNumChildren}
+		\State $c^{*} \gets \langle \tvec^{(k)}, \wbvec_k  \rangle / \normalabs{\wbvec_{k}}^2 $
+		\State $c_{\text{min}} \gets \lceil c^{*} - \tfrac{1}{2} Int \rceil$ \Comment Left-most child
+		\State $c_{\text{max}} \gets \lfloor c^{*} + \tfrac{1}{2} Int \rfloor$ \Comment Right-most child
+		\State $\cvec_k \gets c_{\text{min}}$
+		\State $\tvec^{(k-1)} \gets \tvec^{(k)} - \cvec_k \bvec_k $	 \Comment Project onto $U^{(k)} = \cvec_k \wbvec_{k}+ \Span(\bvec_1, \ldots, \bvec_{k-1})$
+		\State $e^{(k-1)} \gets e^{(k)} + (\cvec_k - c^{*})^2 \|\wbvec_{k}\|^2$ \Comment Compute the squared error-length
+		\State $k \gets k-1$ \Comment Go down the tree
+	\Else \Comment On a leaf
+		\If{($e^{(k)} < \text{minLen}$)}
+			\State $\xvec \gets \sum_{i=1}^k c^{(i)} \bvec_i$ \Comment Current best solution \label{algline:GenPrunDSol}
+		\EndIf
+		\Repeat \Comment Traverse up
+			\If{($k=0 \text{ AND } \cvec_k > c_{\text{max}}$)} \Comment On the root, no right siblings
+				\State \Return $(\xvec, \text{minLen})$
+			\EndIf
+			\State $k \gets k+1$
+		\Until{($\cvec_k \geq c_{\text{max}}$)}
+
+		\State $\cvec_k \gets c^{(k)} + 1$ \Comment Traverse to the right sibling
+		\State $\tvec^{(k-1)} \gets \tvec^{(k)} - \lceil \cvec_k \rfloor \bvec_k $
+		\State $e^{(k-1)} \gets e^{(k)} + (\cvec_k - \lceil \cvec_k \rfloor)^2 \|\wbvec_{k}\|^2$
+
+	\EndIf
+\EndWhile
+
+\State \Return $(\tvec^{(0)}, e^{(0)})$
+
+\end{algorithmic}
+\end{algorithm}
+
+The algorithm described above traverses the enumeration tree in (depth-first) \emph{left-most} child manner (on line 11, we start with $c_{\text{min}}$ that represents the left-most child). This `classical' traversal is depicted in Fig.~\ref{fig:TwoTreesLP}. In the actual implementation, instead of choosing the left-most child and traversing its sub-tree, we first visit the child that gives the shortest error (i.e.\ the one that would have been chosen by Babai's algorithm). Then the sub-tree of this most promising `middle' child is traversed. See Fig.~\ref{fig:TwoTreesPrun} for this tree-traversing strategy. 
+ 
+Further, once we reach the `critical' level $k^*$ determined by the maximal $k$ s.t. $\|\wbvec_k \| > \const \alpha q$ (for some input constant $\const$), we consider only one child for all levels below $k^*$. This additional pruning conforms to the Condition 3 of reasonable pruning (see Def.~\ref{def:ReasonablePruning}): once the Gram-Schmidt vectors are long enough and the solution has `survived' until this level (i.e.\ there exist a path $\cvec$ that contains the coefficients of the solution), we can run the efficient (one child-only) Babai's algorithm. 
+
+Obviously, it makes sense to make the enumeration tree `bushier' on the levels where the $\wbvec_k$'s are relatively short. This is controlled by the function $\B$. In our implementation, it is the linear length pruning function with an additional parameter that controls how wide the tree is allowed to be. 
