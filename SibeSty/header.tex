@@ -1,0 +1,322 @@
+% ==================================================================
+% Definitions for this paper
+% ==================================================================
+\mathchardef\hyphen="2D
+
+\usepackage{multirow}
+\usepackage{multicol} % For multiple coloumn environments
+%\usepackage{stmaryrd} % For set brackets
+% \setlength{\columnsep}{15pt} % Defining the coloumn seperation
+% \setlength{\columnseprule}{1pt} % Place a line between coloumns
+% \newcommand{\tab}{\hspace*{2em}}
+
+% ADVERSARIES AND SUCH
+% \newcommand{\advA}{\mathcal{A}} % Adversary 
+% \newcommand{\advB}{\mathcal{B}} % Simulator
+% \newcommand{\advC}{\mathcal{C}} % Challenger
+% \newcommand{\advD}{\mathcal{D}} % Distinguisher
+% \newcommand{\advF}{\mathcal{F}} % Forger
+% \newcommand{\advI}{\mathcal{I}} % Invertor
+% \newcommand{\advR}{\mathcal{R}} % Reduction
+
+
+% GROUPS/DISTRIBUTIONS/SETS/LISTS
+% \newcommand{\msgspace}{\mathfrak{M}} % Message space
+% \newcommand{\keyspace}{\mathfrak{K}} % Key Space
+% \newcommand{\sigspace}{\mathfrak{S}} % Signature Space
+% \newcommand{\ctspace}{\mathfrak{C}} % Ciphertext Space
+% \newcommand{\prm}{\mathbb{P}} % Set of prime numbers
+\newcommand{\N}{{{\mathbb N}}}
+\newcommand{\Z}{{{\mathbb Z}}}
+\newcommand*{\Q}{\mathbb{Q}}
+\newcommand{\R}{{{\mathbb R}}}
+\newcommand{\F}{{{\mathbb F}}}
+%\newcommand{\T}{\mathbb{T}} % Additive group of reals mod 1: R/Z
+% \newcommand{\dis}{\mathfrak{D}} % Distributions
+% \newcommand{\grp}{\mathbb{G}} % Group
+% \newcommand{\inr}{\in_{_R}} % Uniformily random in
+% \newcommand{\rnd}{\leftarrow_{\mbox{\tiny{\$}}}} % Randomised algorithm output
+\newcommand{\getsr}{\mathbin{\leftarrow_{\mbox{\tiny{\$}}}}} % Randomised algorithm output
+% \newcommand{\intval}[1]{\llbracket #1 \rrbracket} % Int val
+% \newcommand{\qlist}{\mathcal{Q}}
+\newcommand{\LWEErrorDist}{\ensuremath{D}}
+\newcommand{\transpose}{\mkern0.7mu^{\mathsf{ t}}}
+\newcommand{\Ball}{\mathcal{B}} % Ball
+\newcommand{\Image}{\text{Im}} % Image of an operator
+\newcommand*{\poly}{\ensuremath{\mathrm{poly}}}
+\newcommand*{\eps}{\ensuremath{\varepsilon}}
+\renewcommand{\d}{\mathrm{d}}
+\DeclareMathOperator*{\E}{\mathbb{E}} %Expectation
+\newcommand*{\union}{\mathbin{\cup}} %union
+
+%ordinal numbers
+\renewcommand{\th}{^{\mathrm{th}}}
+%\newcommand{\st}{^{\mathrm{st}}}
+\newcommand{\nd}{^{\mathrm{nd}}}
+
+%{0,1}^n
+\newcommand*{\ZO}[1]{\ensuremath{\{0,1 \}^{#1}}}
+
+
+
+%Fancy Roman numerals
+\def\barroman#1{\sbox0{#1}\dimen0=\dimexpr\wd0+1pt\relax
+  \makebox[\dimen0]{\rlap{\vrule width\dimen0 height 0.06ex depth 0.06ex}%
+    \rlap{\vrule width\dimen0 height\dimexpr\ht0+0.03ex\relax 
+            depth\dimexpr-\ht0+0.09ex\relax}%
+    \kern.5pt#1\kern.5pt}}
+
+
+%%% LWE
+\newcommand{\LWEDist}{\mathcal{A}_{\vec s, \chi}}
+%\newcommand{\cq}{\ensuremath{c_\protect\SmallTextScript{1}{{q}}}}
+
+%Constants
+\newcommand{\cq}{\ensuremath{\mathsf{c}_q}}
+\newcommand{\ca}{\ensuremath{\mathsf{c}_{\alpha}}}
+\newcommand{\cm}{\ensuremath{\mathsf{c}_m}}
+\newcommand*\cBKZ{c_{\mkern-1.5mu\protect\SmallTextScript{0.8}{\BKZ}}}
+\newcommand{\cf}{\ensuremath{\mathsf{c}_f}}
+\newcommand{\cg}{\ensuremath{\mathsf{c}_{\gamma}}}
+%\newcommand{\const}{\mathsf{c}} 
+
+\newcommand{\B}{\mathfrak{B}} %family of bounding functions
+\newcommand*\Dmax{D_{\max}} %max distance 
+
+\newcommand*\Enq[2]{{#1}.\mathsf{Enqueue}({#2})}
+\newcommand*\Deq[1]{{#1}.\mathsf{Dequeue}()}
+\newcommand{\counter}{\mathsf{cntr}}
+\newcommand*\nNodes{\mathrm{\#N}} %Number of nodes
+\newcommand*\nT{\mathrm{\#NThreads}} %Number of threads
+\newcommand*{\im}{\ensuremath{i_{\mkern-1.5mu\protect\SmallTextScript{0.7}{\textup{max}}} \mskip -1.5mu }} %i_max
+
+%%% ALGORITHMS/PROCEDURES/PROBLEMS %%%
+\newcommand{\BDD}{\textsf{BDD}\xspace}
+\newcommand{\ALG}{\texttt{ALG}\xspace}
+\newcommand{\DUAL}{\texttt{Dual}\xspace}
+\newcommand{\ENUM}{\texttt{Enum}\xspace}
+\newcommand{\SVP}{\textsf{SVP}\xspace}
+\newcommand{\appSVP}{\ensuremath{\textsf{appSVP}_{\gamma}}\xspace}
+\newcommand{\uSVP}{\ensuremath{\textsf{uSVP}_{\gamma}}\xspace}
+\newcommand{\CVP}{\textsf{CVP}\xspace}
+\newcommand{\BKZ}{\texttt{BKZ}\xspace}
+\newcommand{\LLL}{\texttt{LLL}\xspace}
+\newcommand{\BKW}{\texttt{BKW}\xspace}
+\newcommand{\BKWKF}{\texttt{BKW2}\xspace}
+\newcommand{\LWE}{\textsf{LWE}\xspace}
+\newcommand{\SIS}{\textsf{SIS}\xspace}
+\newcommand{\SIVP}{\textsf{SIVP}\xspace}
+\newcommand{\HKZ}{\textsf{HKZ}\xspace}
+\newcommand{\LPN}{\textsf{LPN}\xspace}
+\newcommand*\GenPrun{\texttt{GenPruning}\xspace}
+\newcommand*\GenPrunDepth{\texttt{GenPruningDepthFirst}\xspace}
+\newcommand*\GP{\texttt{GP}\xspace}
+\newcommand*\NP{\texttt{NearestPlane}\xspace}
+\newcommand*\NPs{\texttt{NearestPlane\underline{s}}\xspace}
+\newcommand{\fplll}{\texttt{fplll}\xspace}
+\newcommand{\AKS}{\textsf{AKS}\xspace}
+
+\newcommand*\Embed{\texttt{Embed}\xspace}
+\newcommand*\Dual{\texttt{Dual}\xspace}
+\newcommand*\DualC{\texttt{Dual}^{1}\xspace}
+
+\newcommand*\SubBabai{{\mbox{\tiny Babai}}}
+\newcommand*\SubLP{{\mbox{\tiny LP}}}
+\newcommand*\SubGenPruning{{\mbox{\tiny GP}}}
+
+\newcommand*{\ENUMOne}{\ENUM_{\protect\SmallTextScript{0.8}{1}}}
+\newcommand*{\ENUMH}{\ENUM_{\protect\SmallTextScript{0.7}{0.292}}}
+
+\newcommand*{\DUALOne}{\DUAL_{\protect\SmallTextScript{0.8}{1}}}
+\newcommand*{\DUALH}{\DUAL_{\protect\SmallTextScript{0.7}{0.292}}}
+
+%Landau and such
+
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\smallo}{o} 
+\newcommand{\wLandau}{\omega}
+\newcommand{\negl}{\mathrm{negl}}
+\newcommand*{\WLandau}{\varOmega}
+\newcommand*{\softO}{\widetilde{\bigO}}
+\newcommand*{\softOmega}{\widetilde{\WLandau}}
+\newcommand*{\TLandau}{\varTheta}
+\newcommand*{\xTLandau}{\widetilde{\TLandau}}
+\newcommand*\PROB\Pr 
+\newcommand*\Psucc{P\mkern-4mu_{\mbox{\tiny succ}}}
+\DeclareMathOperator*{\EXPECT}{\mathbb{E}}
+\DeclareMathOperator*{\VARIANCE}{\mathbb{V}}
+\DeclareMathOperator*{\LOGBIAS}{\mathbb{LB}}
+\DeclareMathOperator*{\low}{\mathrm{low}}
+
+
+%Matrices and Vectors
+\newcommand{\AMat}{\ensuremath{A}}
+\newcommand{\BMat}{\ensuremath{B}}
+\newcommand{\wBMat}{\ensuremath{B^*}}
+\newcommand{\DMat}{\ensuremath{D}}
+\newcommand{\UMat}{\ensuremath{U}}
+\newcommand{\XMat}{\ensuremath{X}}
+\newcommand{\Id}{\ensuremath{\mathbbm{1}}}
+\newcommand{\ZeroM}{\ensuremath{\mathbbm{0}}}
+
+%\renewcommand{\vec}[1]{\vec{#1}\mkern2mu\vphantom{#1}}
+\makeatletter
+\newcommand{\tvec}{\vec t\@ifnextchar{^}{\,}{\,}}
+\newcommand{\svec}{\vec{s}\@ifnextchar{'}{\,}{\,}}
+\newcommand{\evec}{\vec{e}\@ifnextchar{'}{\,}{\,}}
+\newcommand{\bvec}{\vec b}
+\newcommand{\cvec}{\vec c\@ifnextchar{^}{\,}{}}
+\newcommand{\xvec}{\vec x}
+\newcommand{\vvec}{\vec v\@ifnextchar{^}{\,}{}}
+\newcommand{\yvec}{\vec y\@ifnextchar{\ragle}{\,}{\,}}
+\newcommand{\zvec}{\vec z}
+\newcommand{\zerovec}{\vec 0\@ifnextchar{)}{\,}{\,}}
+\newcommand{\onevec}{\vec 1}
+\newcommand{\avec}{\vec a}
+\newcommand{\dvec}{\vec d}
+\newcommand{\pvec}{\vec p\@ifnextchar{'}{\,}{}}
+\newcommand{\uvec}{\vec u}
+\newcommand{\wvec}{\vec w}
+
+\newcommand{\wbvec}{\vec b^*}
+\makeatother
+
+\makeatletter
+\newcommand{\evecp}{\vec{e}\@ifnextchar{'}{\,}{}}
+\makeatother
+
+% Lattices
+\newcommand{\Lat}{\mathcal{L}} %lattice generated as image (rather than kernel).
+\newcommand{\LATTp}{\mathcal{L}^{\perp}}
+\newcommand*{\qLat}{\mathcal{L}_q} %q-ary lattice
+\newcommand*{\qLATTp}{\mathcal{L}_q^{\perp}}
+\newcommand*\FP{\smash{\mathcal{P}\mkern-3mu_{\mbox{\tiny 1/2}}}}
+\DeclareMathOperator\GSO{GSO}
+\newcommand{\LEmb}{\Lat_{\mbox{\tiny Embed}}} %Embedded lattice
+
+
+%\newcommand{\l1}{\lambda_1} %fist successive minima
+% \newcommand{\coset}{\Lambda} % Lambda Lattice
+% \newcommand{\cosetPerp}{\Lambda^{\bot}} % Lambda_Perp Lattice
+% \newcommand{\gadget}{\textbf{G}} %Gaget matrix
+% \newcommand{\mes}{\textbf{m}} %message vector
+% \newcommand{\AMat}{\textbf{A}} %A matrices
+% \newcommand{\BMat}{\textbf{B}} %B matrices
+% \newcommand{\RMat}{\textbf{R}} %R matrices
+% \newcommand{\HMat}{\textbf{H}} %H matrices
+% \newcommand{\XMat}{\textbf{X}} %H matrices
+% \newcommand{\mbar}{\bar{m}} %mBar dimension
+% % \newcommand{\gauss}{\mathcal{D}} % gaussian distribution
+% \newcommand{\Id}{\textbf{I}} % Identity matrix
+% \newcommand{\ZeroM}{\textbf{0}} % Identity matrix
+% \newcommand{\er}{\textbf{e}} % gaussian distr. vectors
+% % \newcommand{\cipher}{\textit{c}} % ciphertext
+% \newcommand{\Olwe}{\mathcal{O}_{\textsf{LWE}}} %LWE oracle
+% \newcommand{\OSample}{\mathcal{O}_{Sample}} %LWE oracle
+% \newcommand{\SigmaB}{\boldsymbol{\Sigma}} %semi-deifinite matrix Sigma%
+% % \newcommand{\mods}{\text{ mod}}
+
+
+%k-Lists
+
+%\newcommand*{\LL}{\ensuremath{\ell}} %\LL_2 - norm, maybe use $\|.\|$
+\newcommand*{\Sphere}[1]{\ensuremath{\mathsf{S}^{#1}}}
+\newcommand*{\Conf}{\ensuremath{\text{Conf}\mkern2mu}}
+\newcommand*{\ConfSpace}{\ensuremath{\mathscr{C}}}
+\newcommand*{\ConfSpacet}{\ensuremath{\mathscr{C}}_{\leq t}}
+\newcommand{\Cmax}{\ensuremath{C_{\text{max}}}}
+\newcommand*{\pW}{\ensuremath{\rho_{\SmallTextScript{0.8}{\text{Wishart}}}}} %Wishart distribution
+\newcommand*{\pC}{\ensuremath{\rho_{\mathscr{C}}}}
+%\newcommand*{\Tr}{\ensuremath{\text{Tr}}} % trace
+\newcommand*{\Cbal}{\ensuremath{C_{\SmallTextScript{0.8}{\text{B}}}}} %balanced configuration
+\newcommand*{\Cbalt}{\ensuremath{C_{\SmallTextScript{0.8}{\text{B,t}}}}} %balanced configuration with target length
+\newcommand*{\CbalOne}{\ensuremath{C_{\SmallTextScript{0.8}{\text{B,1}}}}} %balanced configuration with target length 1
+\newcommand*{\Lout}{\ensuremath{L_{\mkern-0.5mu\protect\SmallTextScript{0.85}{\textup{out}}}}}
+
+%AppSVP
+\newcommand*{\Ei}{\text{E}}
+
+
+
+%subscripts
+
+\newcommand*\SmallTextScript[2]{{\mathchoice{\displaystyle #2}%should never be reached
+{\textstyle #2}%dito
+{\scalebox{#1}{\ensuremath{\scriptstyle #2}}}%
+{\scalebox{#1}{\ensuremath{\scriptscriptstyle #2}}}%
+}}
+% \newcommand*\cq{c_{\protect\SmallTextScript{1}{{q}}}}
+% \newcommand*\cs{c_{\protect\SmallTextScript{1}{{s}}}}
+% \newcommand*\cBKZ{c_{\mkern-1.5mu\protect\SmallTextScript{0.8}{\BKZ}}}
+% \newcommand*\TBKZ{T_{\mkern-1.5mu\protect\SmallTextScript{0.8}{\BKZ}}}
+% \newcommand*\MBKZ{\M_{\mkern-0.5mu\protect\SmallTextScript{0.8}{\BKZ}}}
+
+
+% \newcommand{\rs}{\right]} %right square parenthesis
+% \newcommand{\ls}{\left[} %left square parenthesis
+
+% \newcommand{\bL}{\|\bvec_1\|} % b1 length that appears way too often
+% \newcommand{\dL}{\|\dvec_1\|} % b1 length that appears way too oftend
+
+%Norms and Scalar products
+
+\newcommand*\abs[1]{\left|#1\right|}
+\newcommand*\norm[1]{\left\|#1\right\|}
+\newcommand*\normalabs[1]{|#1|} 
+\newcommand*\normalnorm[1]{\|#1\|}
+\newcommand*\bigabs[1]{\bigl|#1\bigr|}
+\newcommand*{\ScProd}[2]{\ensuremath{\langle#1\!\mathbin{,}\!#2\rangle}} %Scalar Product
+\newcommand*{\bigScProd}[2]{\ensuremath{\bigl\langle#1\mathrel{,}#2\bigr\rangle}} %Scalar Product
+\newcommand*{\BigScProd}[2]{\ensuremath{\Bigl\langle#1\mathbin{,}#2\Bigr\rangle}} %Scalar Product
+
+
+%Some other math operators
+
+\DeclareMathOperator{\Span}{Span} %span of vectors
+\DeclareMathOperator{\vol}{\mathrm{vol}} %volume
+\DeclareMathOperator{\LW}{LambertW} %Lambert W function
+% \DeclareMathOperator{\Proj}{Proj} %Lambert W function
+\DeclareMathOperator{\SD}{SD}
+\DeclareMathOperator{\gradient}{grad}
+
+
+
+
+%\DeclareMathOperator{\erf}{erf} %error function
+\DeclareMathOperator{\erfc}{erfc} %complementary error function
+\newcommand{\Er}{\ensuremath{\mathrm{Er}}} %complementary error function
+
+
+%Thick line for table
+\setlength{\doublerulesep}{0pt}
+\newcommand{\thickline}{\hline\hline\hline}
+
+
+%circled text
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+    \node[shape=circle,draw,inner sep=0.3 pt] (char) {\scriptsize #1};}}
+
+
+%Fix Algorithmicx package
+\def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
+
+%For Figutes in the ApproxSVP part
+\newcommand{\mk}{\mkern-6mu}
+
+%Proper limit with the subscript underneath
+% \newcommand{\Lim}[1]{\raisebox{0.5ex}{\scalebox{0.8}{$\displaystyle \lim_{#1}\;$}}}
+
+%enumerates one line of equations inside multiline align*
+% \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% Reduc
+% \newcommand{\collres}{\mathsf{coll}} % Coll Res
+% \newcommand{\dl}{\mathsf{dlog}} % discrete Log
+% \newcommand{\Succ}{\mathsf{Succ}}
+% \newcommand{\Adv}{\mathsf{Adv}}
+
+%Simplexes
+% \newcommand{\simplex}[1]{\triangle^{#1}} %standard simplex
+% \newcommand{\trsimplex}[1]{\triangle^{#1}_\text{tr}} %truncated simplex
+% \newcommand{\lsimplex}[1]{\triangle^{#1}_\text{lin}} %truncated simplex
+% \newcommand{\lksimplex}[1]{\triangle^{#1}_\text{lin,k}} %truncated simplex2 

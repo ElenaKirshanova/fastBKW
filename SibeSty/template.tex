@@ -1,0 +1,51 @@
+% !TeX encoding = windows-1251
+\documentclass[a4paper,12pt]{article}
+\usepackage{sibecrypt}
+\usepackage{amssymb}
+
+\input{header}
+
+\begin{document}
+	
+	\title[Краткое название]
+	{Введение в критоaнализ систем на евклидовых решетках}
+	{Введение в критоaнализ систем на евклидовых решетках}
+	{Introduction to cryptanalysis of lattice-based cryptosystems}
+	\author{Е.\,А.~Киршанова}{Киршанова~Е.\,А.}{Kirshanova~E.\,A.}
+	\udk{XXX.XX}
+	\maketitle
+	
+	%\footnotetext{Работа поддержана грантом РФФИ, проект \textnumero\,12345.}
+	\begin{abstract}
+		Blah
+		\keywords{криптоанализ, алгоритмы, криптография на евлидовых решетках, алгоритмы редукции базиса решеттки, алгоритмы просеивания}
+	\end{abstract}
+	
+	\begin{algorithm}[t]
+		\caption{$appSVP_{\gamma}$ на $q$-арной решетке}
+		\textbf{Вход:} $D$ -- базис решетки $L^{\perp}_q (A) \subset \Z_q^{2n}$ заданный как в  $\gamma = n^{c_{\gamma}}$ -- фактор аппроксимации, $c_{\gamma}>0$ \\
+		\textbf{Выход:} $L_k$ --список векторов из $L^{\perp}_q (A)$, где все векторы нормы $\| \vec{v} \| \leq n^{c_{\gamma}+c_q/2+1/2}$;
+		%\begin{algorithmic}[1]
+				\State $4$ Blah
+		%\end{algorithmic}
+		\vspace{10pt}
+	\end{algorithm}
+	%\begin{thebibliography}{9}
+	%   \bibitem{1}
+	%   \BibAuthor{Петров\;П.\,П.}
+	%   \BibTitle{Название статьи}~//
+	%   Название журнала. 2009. \textnumero\,1. С.\,1--10.
+	%   \bibitem{2}
+	%   \BibAuthor{Петров\;П.\,П.}
+	%   \BibTitle{Название книги.} М.:~Наука, 2009. 
+	%\end{thebibliography}
+	
+	\enabstract{
+		blah
+		\protect\enkeywords{cryptanalysis, algorithms, lattice-based cryptography, lattice basis reduction, sieving algorithms}}
+	
+	\begin{authors}
+		\item{КИРШАНОВА Елена Алексеевна}{Dr.\ rer.\ nat., пост-докторант в ENS Lyon, Лион, Франция}{elena.kirshanova@ens-lyon.fr}
+	\end{authors}
+	
+\end{document}
