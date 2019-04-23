@@ -23,36 +23,13 @@
 		Blah
 		\keywords{криптоанализ, алгоритмы, криптография на евлидовых решетках, алгоритмы редукции базиса решеттки, алгоритмы просеивания}
 	\end{abstract}
+
+	%--- Section 2 Definitions
+	\input{definitions}
 	
-	\begin{algorithm}[t]
-		\caption{$appSVP_{\gamma}$ на $q$-арной решетке}
-		\textbf{Вход:} $D$ -- базис решетки $L^{\perp}_q (A) \subset \Z_q^{2n}$ заданный как в  $\gamma = n^{c_{\gamma}}$ -- фактор аппроксимации, $c_{\gamma}>0$ \\
-		\textbf{Выход:} $L_k$ --список векторов из $L^{\perp}_q (A)$, где все векторы нормы $\| \vec{v} \| \leq n^{c_{\gamma}+c_q/2+1/2}$;
-		\begin{algorithmic}[1]
-				\STATE Задаем границы просеивания $R_i$ как $R_1 = n^{\smallo(1)}$ и $R_i = \sqrt{2}^{i-1} R_1$ для $i \geq 2$.
-				\STATE Задаем длину блоков $d_i$ как in Eq.(4.18) и границы каждого блока $(l_{i-1}, \ldots, l_i)$ такие, что \ $l_{i}-{l_{i-1}} = d_i$ и $l_k = 1, l_0 = n$.
-				
-				\REPEAT %\Comment{Создаем список $L_0$}
-				\STATE Выбираем $\vec{x} \in \Z_q^{2n}$ такой, что \ $\| [\vec{x}]_{n+1}^{2n} \|_{\infty} \leq R_1$
-				\STATE $L_0 \gets L_0 \union \{D\vec{x} \bmod q\} $
-				\UNTIL {$L_0$ достаточно большой}
-				
-%				\State $T \gets \emptyset$ \Comment{Инициализируем массив $T$ проиндексированный корзинами}
-%				\ForAll {$i=1 \ldots k$}
-%				\ForAll { $\vec{v} \in L_{i-1}$}
-%				\State $b \gets \Big\lfloor \frac{[\vec{v}]_{l_i}^{l_{i-1}}}{R_i} \Big\rceil$ \Comment{Ищем корзины для $\vec{v}\mkern2mu[l_i, \ldots, l_{i-1}]$}
-%				\If{$T[b] = \emptyset$}
-%				\State $T[b] \gets \vec{v}$
-%				\Else
-%				\State $L_{i} \gets L_{i} \union \{T[b] - \vec{v} \}$
-%				\State $T[b] \gets \emptyset$
-%				\EndIf
-%				\EndFor
-%				\EndFor
-%				\State \Return $L_k$
-		\end{algorithmic}
-		\vspace{10pt}
-	\end{algorithm}
+	%--- Section 3 Algorithm
+	\input{algorithm}
+	
 	%\begin{thebibliography}{9}
 	%   \bibitem{1}
 	%   \BibAuthor{Петров\;П.\,П.}
@@ -73,12 +50,6 @@
 
 \clearpage
 	
-%--- Section 2 Definitions
-\input{definitions}
-\clearpage
 
-%--- Section 3 Algorithm
-\input{algorithm}
-\clearpage
 	
 \end{document}
