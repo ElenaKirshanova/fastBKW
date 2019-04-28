@@ -11,45 +11,118 @@
 \begin{document}
 	
 	\title[Краткое название]
-	{blah}
-	{blah}
-	{blah}
-	\author{Е.\,А.~Киршанова}{Киршанова~Е.\,А.}{Kirshanova~E.\,A.}
+	{Задача нахождения короткого вектора решетки в бесконечной норме}
+	{Задача нахождения короткого вектора решетки в бесконечной норме}
+	{Shortest Vector Problem in the infinity norm}
+	\author{Д.\,О.~Олефиренко}{Олефиренко~Д.\,О.}{Olefirenko~D.\,O.}
 	\udk{XXX.XX}
 	\maketitle
 	
-	%\footnotetext{Работа поддержана грантом РФФИ, проект \textnumero\,12345.}
 	\begin{abstract}
-		Blah
+		Разработан алгоритм решения аппроксимированной задачи поиска ближайшего вектора ($appSVP_{\gamma}$) $q$-арной решетки в бесконечной норме. $q$-арная
+		решетка имеет вид
+		\[
+		\Lat_q(B) = \{ \vec{y} \in \Z^n : \vec{y} = \sum_{i = 1}^n z_i \cdot \vec{b_i} = B\vec{z} \mod q : z_i \in \Z \}.
+		\]
+		Под бесконечной нормой понимается
+		\[
+		\| \vvec \|_\infty = \max{\{ \| v_i \| | i=1...n\}}.
+		\]
+		Приведено подробное пошаговое описание алгоритма и псевдокод. Произведен анализ полученного алгоритма.
+		Получено ожидаемое время работы и оценка памяти.
 		\keywords{криптоанализ, алгоритмы, криптография на евлидовых решетках, алгоритмы редукции базиса решеттки, алгоритмы просеивания}
 	\end{abstract}
+	
+	\begin{center}
+	\textbf{Введение}
+	\end{center}
+	
+Современная криптография с открытым ключом полагается на проблемы факторизации и вычисления дискретного логарифма, которые легко решаются на квантовом 		компьютере. Следовательно, с развитием квантовых вычислений все используемые криптосистемы будут уязвимы, если не будет подготовлено хорошей альтернативы, сложной для взлома даже в постквантовую эру. Одной из альтернатив доквантовым системам являются криптосистемы, основанные на решётках.
 
-	%--- Section 2 Definitions
+В основе криптографии на решетках лежат вычислительно сложные задачи. Наиболее известными из них являются задачи поиска кратчайшего вектора решетки ($SVP$) и ближайшего вектора решетки к заданному ($CVP$).
+
+Также стоит отметить, что с практической точки зрения, криптосистемы основанные на решетках имеют высокую эффективность и легко распараллеливаемы. Основные вычисления включают в себя линейные операции над матрицами по модулю малого целого числа.
+
+Данная работа посвящена алгоритму для задачи $SVP$. Алгоритмы решения этой задачи делятся на два больших класса детерминированные и вероятностные. Основные семейства детерминированных алгоритмов это алгоритмы перечисления \cite{1,2} и разбиение Вороного \cite{3}. Среди вероятностных выделяют Гауссову выборку cite{4} и алгоритмы просеивания \cite{5-8}.
+
+Стоит отметить, что большинство работ, посвященных $SVP$, опираются на вычисления в самой распространенной Евклидовой норме ($l_2$). Однако не менее интересным будет рассмотреть задачу $SVP$ в бесконечной норме ($l_\infty$).
+
+На сегодняшний день только одна работа посвящена этому вопросу \cite{9}. В этой же статье мы приведем комбинаторный алгоритм для решения аппроксимированной задачи $SVP$, обозначаемой $appSVP_{\gamma}$, на $q$-арной решетке и проведем его анализ.
+
+
+	%--- Section 1 Definitions
 	\input{definitions}
 	
-	%--- Section 3 Algorithm
+	%--- Section 2 Algorithm
 	\input{algorithm}
 	
-	%--- Section 4 Analysis
+	%--- Section 3 Analysis
 	\input{analysis}
 	
-	%\begin{thebibliography}{9}
-	%   \bibitem{1}
-	%   \BibAuthor{Петров\;П.\,П.}
-	%   \BibTitle{Название статьи}~//
-	%   Название журнала. 2009. \textnumero\,1. С.\,1--10.
-	%   \bibitem{2}
-	%   \BibAuthor{Петров\;П.\,П.}
-	%   \BibTitle{Название книги.} М.:~Наука, 2009. 
-	%\end{thebibliography}
+	\begin{center}
+	\textbf{Заключение}
+	\end{center}
+	
+	В данной статье мы привели алгоритм решения аппроксимированной задачи поиска ближайшего вектора ($appSVP_{\gamma}$) $q$-арной решетки в бесконечной норме. Приведен анализ алгоритма и получены оценки всех необходимых параметров. В дальнейшем планируется произвести сравнительный анализ существующих алгоритмов решения задачи SVP с нашим.
+	
+	\begin{thebibliography}{9}
+	   \bibitem{1}
+	   \BibAuthor{Kannan \;R.}
+	   \BibTitle{Minkowski's Convex Body Theorem and Integer Programming.}~//
+	   Math. Oper. Res. 1987. \textnumero\,3. С.\,415--440.
+	   \bibitem{2}
+	   \BibAuthor{Kannan \;R. \, Pujol \;X. \, Stehl{\' e} \;D.}
+	   \BibTitle{Analyzing blockwise lattice algorithms using dynamical systems.}~//
+	   CRYPTO 2011, 2011 \textnumero\,6841. С.\,447-464.
+	   \bibitem{3}
+	   \BibAuthor{Micciancio \;D. \, Voulgaris \;P.}
+	   \BibTitle{A deterministic single exponential time algorithm for most lattice problems based on voronoi cell computations.}~//
+	   42nd ACM STOC. 2010. С.\,351--358.
+	   \bibitem{4}
+	   \BibAuthor{Aggarwal \;D. \, Dadush \;D. \, Regev \;O. \, Stephens-Davidowitz \;N.}
+	   \BibTitle{ Solving the shortest vector problem in 2n time using discrete Gaussian sampling: Extended abstract.}~//
+	   47th ACM STOC. 2015. С.\,733--742.
+	   \bibitem{5}
+	   \BibAuthor{Ajtai \;M. \, Kumar \;R. \, Sivakumar \;D.}
+	   \BibTitle{A sieve algorithm for the shortest lattice vector problem.}~//
+	   33rd ACM STOC. 2001. С.\,601--610.
+	   \bibitem{6}
+	   \BibAuthor{Pujol \;X. \, Stehl{\' e} \;D.}
+	   \BibTitle{Solving the Shortest Lattice Vector Problem in Time {$2^{2.465n}$}.}~//
+	   Cryptology ePrint Archive, Report 2009/605, 2009. \url{http://eprint.iacr.org/2009/605}
+	   \bibitem{7}
+	   \BibAuthor{Becker \;A. \, Ducas \;L. \, Gama \;L. \, Laarhoven \;T.}
+	   \BibTitle{New directions in nearest neighbor searching with applications to lattice sieving.} ~//
+	   27th SODA. 2016. С.\,10--24.
+	   \bibitem{8}
+	   \BibAuthor{Bai \;S. \, Laarhoven \;T. \, Stehl{\' e} \;D.}
+	   \BibTitle{Tuple lattice sieving}~//
+	   LMS Journal of Computation and Mathematics. 2016. \textnumero\,19A. С.\,146-162.
+	   \bibitem{9}
+	   \BibAuthor{Aggarwal \;D. \, Mukhopadhyay \;P.}
+	   \BibTitle{Improved algorithms for the Shortest Vector Problem and the Closest Vector Problem in the infinity norm.}~//
+	   arXiv:1801.02358, 2018.
+	   \bibitem{10}
+	   \BibAuthor{Ajtai \;M.}
+	   \BibTitle{Generating hard instances of lattice problems (extended abstract).}~//
+	   28th ACM STOC. 1996. С.\,99--108.
+	   \bibitem{11}
+	   \BibAuthor{Micciancio \;D.}
+	   \BibTitle{Almost perfect lattices, the covering radius problem, and applications to ajtai’s connection factor.}~//
+	   SIAM J. Comput. 2005. С.\,118--169.
+	   \bibitem{12}
+	   \BibAuthor{Micciancio \;D. \, Regev \;O.}
+	   \BibTitle{Worst-case to average-case reductions based on Gaussian measures.}~//
+	   45th FOCS. 2004. С.\,372--381.
+	\end{thebibliography}
 	
 	\enabstract{
 		blah
 		\protect\enkeywords{cryptanalysis, algorithms, lattice-based cryptography, lattice basis reduction, sieving algorithms}}
 	
-	\begin{authors}
-		\item{КИРШАНОВА Елена Алексеевна}{Dr.\ rer.\ nat., пост-докторант в ENS Lyon, Лион, Франция}{elena.kirshanova@ens-lyon.fr}
-	\end{authors}
+	%\begin{authors}
+	%	\item{ОЛЕФИРЕНКО Денис Олегович}{аспирант в БФУ им. И. Канта, Калининград, Россия}{denis\_cooler\_1@mail.ru}
+	%\end{authors}
 
 \clearpage
 	
